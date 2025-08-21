@@ -34,6 +34,9 @@ const FullCalendarNotes: React.FC = () => {
   const [note, setNote] = useState('');
   const [noteTitle, setNoteTitle] = useState('');
   const [editingEvent, setEditingEvent] = useState<NoteEvent | null>(null);
+  // Add state for calendar navigation
+  const [calendarDate, setCalendarDate] = useState<Date>(new Date());
+  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>('month');
 
   const handleSelectSlot = ({ start }: { start: Date }) => {
     setSelectedDate(start);
@@ -89,6 +92,24 @@ const FullCalendarNotes: React.FC = () => {
     <div style={{ display: 'flex', gap: '32px', maxWidth: '1200px', margin: '40px auto', background: 'linear-gradient(135deg, #232526 60%, #1a1a1a 100%)', borderRadius: '18px', boxShadow: '0 4px 24px rgba(0,0,0,0.6)', padding: '32px', border: '2.5px solid #FFD700', color: '#FFD700' }}>
       <div style={{ flex: 2 }}>
         <h2 style={{ textAlign: 'center', marginBottom: '18px', fontWeight: 700, fontSize: '2em', letterSpacing: '1px', textShadow: '0 2px 12px #000', borderBottom: '2px solid #FFD700', paddingBottom: '10px', borderRadius: '8px', background: 'rgba(35,37,38,0.7)', boxShadow: '0 2px 8px #222' }}>Calendar & Daily Notes</h2>
+        {/* Year selector dropdown */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '12px', gap: '12px' }}>
+          <label htmlFor="year-select" style={{ color: '#FFD700', fontWeight: 700, fontSize: '1.1em' }}>Year:</label>
+          <select
+            id="year-select"
+            value={calendarDate.getFullYear()}
+            onChange={e => {
+              const newYear = parseInt(e.target.value, 10);
+              setCalendarDate(new Date(newYear, calendarDate.getMonth(), 1));
+            }}
+            style={{ fontSize: '1.1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222', padding: '4px 12px' }}
+          >
+            {Array.from({ length: 21 }, (_, i) => {
+              const year = new Date().getFullYear() - 10 + i;
+              return <option key={year} value={year}>{year}</option>;
+            })}
+          </select>
+        </div>
         <div style={{ textAlign: 'center', marginBottom: '12px', color: '#FFD700', fontWeight: 500, fontSize: '1.1em', background: 'rgba(35,37,38,0.7)', borderRadius: '8px', padding: '8px 0', boxShadow: '0 1px 4px #222' }}>
           Double click to add or edit notes
         </div>
@@ -108,6 +129,10 @@ const FullCalendarNotes: React.FC = () => {
             fontFamily: 'Monotype Corsiva, cursive',
           }}
           selectable
+          date={calendarDate}
+          view={calendarView}
+          onNavigate={(date: Date) => setCalendarDate(date)}
+          onView={(view: string) => setCalendarView(view as 'month' | 'week' | 'day')}
           onSelectSlot={(slotInfo: { start: Date }) => {
             const now = Date.now();
             if (now - lastSlotClick < 350) {
