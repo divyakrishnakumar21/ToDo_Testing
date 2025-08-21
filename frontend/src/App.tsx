@@ -167,7 +167,7 @@ function AppContent() {
         width: '100%',
         gap: 24,
       }}>
-        <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: 88, width: 88, borderRadius: 18, boxShadow: '0 4px 16px #222', objectFit: 'cover', marginRight: 16 }} />
+  <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: 88, width: 88, borderRadius: 18, boxShadow: '0 4px 16px #222', objectFit: 'cover', marginRight: 16 }} />
         <div>
           <div style={{ fontSize: '2em', fontWeight: 700, color: '#FFD700', marginBottom: 4, textShadow: '0 2px 12px #1976d2' }}>{greetings[greetingIdx]} Divya!</div>
           <div style={{ color: '#1976d2', fontWeight: 700, fontSize: '1.5em', marginBottom: 4, textShadow: '0 2px 12px #FFD700' }}>What's on your mind today?</div>

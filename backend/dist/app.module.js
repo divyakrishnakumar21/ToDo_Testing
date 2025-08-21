@@ -10,14 +10,22 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
 const tasks_controller_1 = require("./tasks.controller");
+const tasks_service_1 = require("./tasks/tasks.service");
+const task_schema_1 = require("./tasks/task.schema");
+const mongoose_1 = require("@nestjs/mongoose");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
+        imports: [
+            mongoose_1.MongooseModule.forRoot('mongodb://localhost:27017/todo_db'),
+            mongoose_1.MongooseModule.forFeature([
+                { name: task_schema_1.Task.name, schema: task_schema_1.TaskSchema },
+            ]),
+        ],
         controllers: [auth_controller_1.AuthController, tasks_controller_1.TasksController],
-        providers: [],
+        providers: [tasks_service_1.TasksService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

@@ -16,57 +16,38 @@ exports.TasksController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const create_task_dto_1 = require("./tasks/dto/create-task.dto");
+const update_task_dto_1 = require("./tasks/dto/update-task.dto");
+const tasks_service_1 = require("./tasks/tasks.service");
 let TasksController = class TasksController {
-    constructor() {
-        this.tasks = [];
+    constructor(tasksService) {
+        this.tasksService = tasksService;
     }
-    findAll(date) {
-        if (date) {
-            return this.tasks.filter(t => t.dueDate?.toISOString().slice(0, 10) === date);
-        }
-        return this.tasks;
+    async findAll() {
+        return this.tasksService.findAll();
     }
-    findOne(id) {
-        return this.tasks.find(t => t.id === id);
+    async findOne(id) {
+        return this.tasksService.findOne(id);
     }
-    create(dto) {
-        const task = { ...dto, id: Date.now().toString(), completed: false };
-        this.tasks.push(task);
-        return task;
+    async create(dto) {
+        return this.tasksService.create(dto);
     }
-    update(id, dto) {
-        const idx = this.tasks.findIndex(t => t.id === id);
-        if (idx === -1)
-            return { error: 'Task not found' };
-        this.tasks[idx] = { ...this.tasks[idx], ...dto };
-        return this.tasks[idx];
+    async update(id, dto) {
+        return this.tasksService.update(id, dto);
     }
-    remove(id) {
-        this.tasks = this.tasks.filter(t => t.id !== id);
-        return { deleted: true };
+    async remove(id) {
+        return this.tasksService.remove(id);
     }
-    complete(id, body) {
-        const task = this.tasks.find(t => t.id === id);
-        if (!task)
-            return { error: 'Task not found' };
-        task.completed = body.completed;
-        if (body.completed) {
-            task.completedOn = body.completedOn || new Date().toISOString();
-        }
-        else {
-            task.completedOn = undefined;
-        }
-        return task;
+    async complete(id, body) {
+        return this.tasksService.complete(id, body.completed, body.completedOn);
     }
 };
 exports.TasksController = TasksController;
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'List all tasks, optionally filter by date' }),
-    __param(0, (0, common_1.Query)('date')),
+    (0, swagger_1.ApiOperation)({ summary: 'List all tasks' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
 ], TasksController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
@@ -74,7 +55,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TasksController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
@@ -82,7 +63,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_task_dto_1.CreateTaskDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TasksController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':id'),
@@ -90,8 +71,8 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_task_dto_1.CreateTaskDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [String, update_task_dto_1.UpdateTaskDto]),
+    __metadata("design:returntype", Promise)
 ], TasksController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
@@ -99,7 +80,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TasksController.prototype, "remove", null);
 __decorate([
     (0, common_1.Put)(':id/complete'),
@@ -108,10 +89,11 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TasksController.prototype, "complete", null);
 exports.TasksController = TasksController = __decorate([
     (0, swagger_1.ApiTags)('tasks'),
-    (0, common_1.Controller)('tasks')
+    (0, common_1.Controller)('tasks'),
+    __metadata("design:paramtypes", [tasks_service_1.TasksService])
 ], TasksController);
 //# sourceMappingURL=tasks.controller.js.map

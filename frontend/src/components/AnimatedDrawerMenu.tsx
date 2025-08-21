@@ -7,7 +7,6 @@ const menuItems = [
   { label: 'Completed Tasks', link: '/completed', icon: '✅' },
   { label: 'Calendar', link: '/calendar', icon: '📅' },
   { label: 'Notes', link: '/notes', icon: '📝' },
-  { label: 'Profile', link: '/profile', icon: '👤' },
 ];
 
 const AnimatedDrawerMenu: React.FC = () => {
