@@ -19,14 +19,27 @@ import NotesMenu from './components/NotesMenu';
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState<string | null>(null);
   const handleLogin = (email: string, password: string) => {
-    // Call backend login API here, then navigate to main page
-    // For now, just navigate
-    navigate('/main');
+    fetch('http://localhost:3000/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message === 'Login successful') {
+          setLoginError(null);
+          navigate('/main');
+        } else {
+          setLoginError(data.message || 'Login failed');
+        }
+      })
+      .catch(() => setLoginError('Network error'));
   };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
-      <Login onLogin={handleLogin} onCreateAccount={() => navigate('/signup')} />
+      <Login onLogin={handleLogin} onCreateAccount={() => navigate('/signup')} loginError={loginError} />
       <WorldClock />
       <WeatherWidget />
     </div>
@@ -36,9 +49,21 @@ function LoginPage() {
 function SignupPage() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  const handleSignup = (email: string, password: string) => {
-    // Call backend signup API here, then show modal
-    setShowModal(true);
+  const handleSignup = (name: string, email: string, password: string) => {
+    fetch('http://localhost:3000/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message === 'Signup successful') {
+          setShowModal(true);
+        } else {
+          alert(data.message || 'Signup failed');
+        }
+      })
+      .catch(() => alert('Signup error'));
   };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
@@ -193,12 +218,11 @@ function AppContent() {
 
 function SignupScreen() {
   const navigate = useNavigate();
-  const handleSignup = (email: string, password: string) => {
-    // Call backend signup API
+  const handleSignup = (name: string, email: string, password: string) => {
     fetch('http://localhost:3000/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ name, email, password })
     })
       .then(res => res.json())
       .then(data => {
@@ -206,7 +230,7 @@ function SignupScreen() {
           alert('Account created! Please login.');
           navigate('/');
         } else {
-          alert('Signup failed');
+          alert(data.message || 'Signup failed');
         }
       })
       .catch(() => alert('Signup error'));

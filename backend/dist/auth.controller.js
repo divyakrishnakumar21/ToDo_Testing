@@ -14,24 +14,26 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const auth_service_1 = require("./auth/auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const auth_dto_1 = require("./auth/dto/auth.dto");
-let users = [];
 let AuthController = class AuthController {
-    signup(authDto) {
-        const existing = users.find(u => u.email === authDto.email);
-        if (existing) {
-            return { message: 'Signup failed', error: 'Email already exists' };
+    async signup(authDto) {
+        if (!authDto.email || !authDto.password || !authDto.name) {
+            return { message: 'Missing required fields' };
         }
-        users.push({ email: authDto.email, password: authDto.password });
-        return { message: 'Signup successful' };
+        const user = await this.authService.signup(authDto.name, authDto.email, authDto.password);
+        return { message: 'Signup successful', user };
     }
-    login(authDto) {
-        const user = users.find(u => u.email === authDto.email && u.password === authDto.password);
-        if (user) {
-            return { message: 'Login successful', user: authDto };
+    constructor(authService) {
+        this.authService = authService;
+    }
+    async login(authDto) {
+        const user = await this.authService.validateUser(authDto.email, authDto.password);
+        if (!user) {
+            return { message: 'Password incorrect' };
         }
-        return { message: 'Login failed', error: 'Invalid credentials' };
+        return { message: 'Login successful', user };
     }
 };
 exports.AuthController = AuthController;
@@ -41,7 +43,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_dto_1.AuthDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signup", null);
 __decorate([
     (0, common_1.Post)('login'),
@@ -49,10 +51,11 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_dto_1.AuthDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
-    (0, common_1.Controller)('auth')
+    (0, common_1.Controller)('auth'),
+    __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

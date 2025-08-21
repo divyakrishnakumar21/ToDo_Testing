@@ -1,9 +1,31 @@
-import { User } from './user.entity';
+import { Model } from 'mongoose';
+import { User } from './user.schema';
 export declare class AuthService {
-    private users;
-    signup(name: string, email: string, password: string): Promise<User>;
-    validateUser(email: string, password: string): Promise<User | null>;
-    login(email: string, password: string): Promise<User | null>;
-    getProfile(userId: string): Promise<User | undefined>;
-    updateProfile(userId: string, name: string, email: string): Promise<User | undefined>;
+    private userModel;
+    constructor(userModel: Model<User>);
+    signup(name: string, email: string, password: string): Promise<import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
+        _id: unknown;
+    }> & {
+        __v: number;
+    }>;
+    validateUser(email: string, password: string): Promise<(import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
+        _id: unknown;
+    }> & {
+        __v: number;
+    }) | null>;
+    login(email: string, password: string): Promise<(import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
+        _id: unknown;
+    }> & {
+        __v: number;
+    }) | null>;
+    getProfile(userId: string): Promise<(import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
+        _id: unknown;
+    }> & {
+        __v: number;
+    }) | null>;
+    updateProfile(userId: string, name: string, email: string): Promise<(import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
+        _id: unknown;
+    }> & {
+        __v: number;
+    }) | null>;
 }

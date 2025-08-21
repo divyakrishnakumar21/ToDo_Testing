@@ -6,28 +6,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const auth_controller_1 = require("./auth.controller");
-const auth_module_1 = require("./auth/auth.module");
-const tasks_controller_1 = require("./tasks.controller");
-const tasks_service_1 = require("./tasks/tasks.service");
-const task_schema_1 = require("./tasks/task.schema");
 const mongoose_1 = require("@nestjs/mongoose");
-let AppModule = class AppModule {
+const auth_service_1 = require("./auth.service");
+const auth_controller_1 = require("../auth.controller");
+const user_schema_1 = require("./user.schema");
+let AuthModule = class AuthModule {
 };
-exports.AppModule = AppModule;
-exports.AppModule = AppModule = __decorate([
+exports.AuthModule = AuthModule;
+exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot('mongodb://localhost:27017/todo_db'),
             mongoose_1.MongooseModule.forFeature([
-                { name: task_schema_1.Task.name, schema: task_schema_1.TaskSchema },
+                { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
             ]),
-            auth_module_1.AuthModule,
         ],
-        controllers: [auth_controller_1.AuthController, tasks_controller_1.TasksController],
-        providers: [tasks_service_1.TasksService],
+        providers: [auth_service_1.AuthService],
+        controllers: [auth_controller_1.AuthController],
+        exports: [auth_service_1.AuthService],
     })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+], AuthModule);
+//# sourceMappingURL=auth.module.js.map

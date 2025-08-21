@@ -9,21 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthDto = void 0;
-const swagger_1 = require("@nestjs/swagger");
-class AuthDto {
-}
-exports.AuthDto = AuthDto;
+exports.UserSchema = exports.User = void 0;
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+let User = class User extends mongoose_2.Document {
+};
+exports.User = User;
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], AuthDto.prototype, "name", void 0);
+], User.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, mongoose_1.Prop)({ required: true, unique: true }),
     __metadata("design:type", String)
-], AuthDto.prototype, "email", void 0);
+], User.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], AuthDto.prototype, "password", void 0);
-//# sourceMappingURL=auth.dto.js.map
+], User.prototype, "password", void 0);
+exports.User = User = __decorate([
+    (0, mongoose_1.Schema)()
+], User);
+exports.UserSchema = mongoose_1.SchemaFactory.createForClass(User);
+//# sourceMappingURL=user.schema.js.map

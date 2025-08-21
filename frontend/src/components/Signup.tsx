@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 
+
 interface SignupProps {
-  onSignup: (email: string, password: string) => void;
+  onSignup: (name: string, email: string, password: string) => void;
   onLoginLink: () => void;
 }
 
 const Signup: React.FC<SignupProps> = ({ onSignup, onLoginLink }) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,7 +15,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLoginLink }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -22,7 +24,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLoginLink }) => {
       return;
     }
     setError('');
-    onSignup(email, password);
+    onSignup(name, email, password);
   };
 
   return (
@@ -43,6 +45,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLoginLink }) => {
     }}>
       <h2 style={{ color: '#FFD700', marginBottom: '18px', textAlign: 'center', fontWeight: 700, fontSize: '2em', letterSpacing: '1px' }}>Create Account</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', width: '100%' }}>
+        <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #FFD700', fontSize: '1em' }} />
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #FFD700', fontSize: '1em' }} />
         <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #FFD700', fontSize: '1em' }} />
         <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #FFD700', fontSize: '1em' }} />
