@@ -5,6 +5,7 @@ import { EditTodoForm } from './components/EditTodoForm';
 import { TodoCardProps } from './components/TodoCard';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { CompletedTasks } from './components/CompletedTasks';
+import FullCalendarNotes from './components/FullCalendarNotes';
 
 const API_URL = 'http://localhost:3000/tasks';
 
@@ -140,42 +141,57 @@ function AppContent() {
       fontFamily: 'Monotype Corsiva, cursive',
       position: 'relative'
     }}>
-      {/* Time widget below weather widget on right side */}
-    <div style={{ position: 'absolute', top: 320, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'left', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
-      <div style={{ fontSize: '1.5em', fontWeight: 700, marginBottom: '12px', color: '#FFD700', letterSpacing: '2px', textAlign: 'center', textShadow: '0 2px 8px #000' }}>World Clocks</div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-        <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇮🇳</span>
-        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Bangalore</span>
-        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Asia/Kolkata')}</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-        <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="Germany">🇩🇪</span>
-        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Berlin</span>
-        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Europe/Berlin')}</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="United States">🇺🇸</span>
-        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Redmond</span>
-        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Los_Angeles')}</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇨🇦</span>
-        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Toronto</span>
-        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Toronto')}</span>
-      </div>
-    </div>
-    {/* Link just below the widget, not inside */}
-    <div style={{ position: 'absolute', top: 580, right: 32, width: '240px', zIndex: 21, textAlign: 'center' }}>
-      {location.pathname === '/completed' ? (
-        <Link to="/" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
-          Go back
-        </Link>
-      ) : (
-        <Link to="/completed" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
-          Click here for completed tasks
+      {/* Home button at top right, hidden on main page */}
+      {location.pathname !== '/' && (
+        <Link to="/" style={{ position: 'absolute', top: 24, right: 24, zIndex: 100, background: 'rgba(35,37,38,0.85)', borderRadius: '10px', boxShadow: '0 2px 8px #222', padding: '8px 16px', color: '#FFD700', textDecoration: 'none', fontWeight: 700, fontSize: '1.1em', letterSpacing: '1px', transition: 'background 0.3s', border: '2px solid #FFD700' }}>
+          Home
         </Link>
       )}
-    </div>
+      {location.pathname !== '/calendar' && (
+        <>
+          {/* Time widget below weather widget on right side */}
+          <div style={{ position: 'absolute', top: 320, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'left', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
+            <div style={{ fontSize: '1.5em', fontWeight: 700, marginBottom: '12px', color: '#FFD700', letterSpacing: '2px', textAlign: 'center', textShadow: '0 2px 8px #000' }}>World Clocks</div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇮🇳</span>
+              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Bangalore</span>
+              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Asia/Kolkata')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="Germany">🇩🇪</span>
+              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Berlin</span>
+              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Europe/Berlin')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="United States">🇺🇸</span>
+              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Redmond</span>
+              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Los_Angeles')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇨🇦</span>
+              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Toronto</span>
+              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Toronto')}</span>
+            </div>
+          </div>
+          {/* Link just below the widget, not inside */}
+          <div style={{ position: 'absolute', top: 580, right: 32, width: '240px', zIndex: 21, textAlign: 'center' }}>
+            {location.pathname === '/completed' ? (
+              <Link to="/" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
+                Go back
+              </Link>
+            ) : (
+              <>
+                <Link to="/completed" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
+                  Click here for completed tasks
+                </Link>
+                <Link to="/calendar" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
+                  Go to calendar
+                </Link>
+              </>
+            )}
+          </div>
+        </>
+      )}
 <div style={{ position: 'relative', width: '100%' }}>
   <span style={{
     position: 'absolute',
@@ -196,8 +212,9 @@ function AppContent() {
   }}>{greetings[greetingIdx]} Divya</span>
 </div>
 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', width: '100%', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
-  {/* Weather widget and date/time on right side */}
-<div style={{ position: 'absolute', top: 32, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'center', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
+  {/* Weather widget and date/time on right side, only if not on /calendar */}
+  {location.pathname !== '/calendar' && (
+    <div style={{ position: 'absolute', top: 32, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'center', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
       <div style={{ fontSize: '1.1em', fontWeight: 700, marginBottom: '4px', color: '#FFD700', letterSpacing: '1px' }}>Berlin, Germany</div>
       <div style={{ fontSize: '2em', marginBottom: '8px' }}>{weather ? weather.icon : '⛅'}</div>
       <div style={{ fontSize: '1.2em', fontWeight: 700 }}>{weather ? `${weather.temp}°C` : 'Loading...'}</div>
@@ -205,9 +222,10 @@ function AppContent() {
       <div style={{ fontSize: '1em', fontWeight: 500 }}>{dateTime.toLocaleDateString()}</div>
       <div style={{ fontSize: '1.1em', fontWeight: 700 }}>{dateTime.toLocaleTimeString()}</div>
     </div>
-      <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: '96px', width: '96px', marginRight: '24px', borderRadius: '18px', boxShadow: '0 4px 16px #222', objectFit: 'cover' }} />
-      <h1 style={{ color: '#1976d2', marginBottom: '0', fontWeight: 700, textAlign: 'left' }}>What's on your mind today?</h1>
-    </div>
+  )}
+  <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: '96px', width: '96px', marginRight: '24px', borderRadius: '18px', boxShadow: '0 4px 16px #222', objectFit: 'cover' }} />
+  <h1 style={{ color: '#1976d2', marginBottom: '0', fontWeight: 700, textAlign: 'left' }}>What's on your mind today?</h1>
+</div>
       <Routes>
         <Route path="/" element={
           <>
@@ -219,6 +237,7 @@ function AppContent() {
           </>
         } />
         <Route path="/completed" element={<CompletedTasks todos={todos} />} />
+  <Route path="/calendar" element={<FullCalendarNotes />} />
       </Routes>
     </div>
   );
