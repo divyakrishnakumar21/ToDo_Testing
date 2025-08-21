@@ -1,87 +1,105 @@
+
 import React, { useEffect, useState } from 'react';
+import SidebarMenu from './components/SidebarMenu';
+import AnimatedDrawerMenu from './components/AnimatedDrawerMenu';
+import ProfileMenu from './components/ProfileMenu';
+import HamburgerMenu from './components/HamburgerMenu';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import Signup from './components/Signup';
+import Login from './components/Login';
+import WorldClock from './components/WorldClock';
+import WeatherWidget from './components/WeatherWidget';
 import { TodoList } from './components/TodoList';
 import { AddTodoForm } from './components/AddTodoForm';
 import { EditTodoForm } from './components/EditTodoForm';
 import { TodoCardProps } from './components/TodoCard';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { CompletedTasks } from './components/CompletedTasks';
+import { CompletedTasks as CompletedTasksTable } from './components/CompletedTasks';
 import FullCalendarNotes from './components/FullCalendarNotes';
+import NotesMenu from './components/NotesMenu';
+
+function LoginPage() {
+  const navigate = useNavigate();
+  const handleLogin = (email: string, password: string) => {
+    // Call backend login API here, then navigate to main page
+    // For now, just navigate
+    navigate('/main');
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
+      <Login onLogin={handleLogin} onCreateAccount={() => navigate('/signup')} />
+      <WorldClock />
+      <WeatherWidget />
+    </div>
+  );
+}
+
+function SignupPage() {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const handleSignup = (email: string, password: string) => {
+    // Call backend signup API here, then show modal
+    setShowModal(true);
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
+      <Signup onSignup={handleSignup} onLoginLink={() => navigate('/')} />
+      <WorldClock />
+      <WeatherWidget />
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 4px 24px #222',
+            padding: '40px 32px',
+            minWidth: 320,
+            textAlign: 'center',
+            color: '#1976d2',
+            fontWeight: 700
+          }}>
+            <h2 style={{ marginBottom: 16 }}>Sign Up Successful!</h2>
+            <p style={{ marginBottom: 24 }}>Your account has been created.</p>
+            <button onClick={() => { setShowModal(false); navigate('/'); }} style={{ background: '#FFD700', color: '#1976d2', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 700, fontSize: '1.1em', cursor: 'pointer', boxShadow: '0 2px 8px #222' }}>Go to Login</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const API_URL = 'http://localhost:3000/tasks';
 
-const greetings = [
-  'Hi',
-  'Hola',
-  'Bonjour',
-  'Hallo',
-  'Ciao',
-  'Olá',
-  'Привет',
-  'नमस्ते',
-  'こんにちは',
-  '你好',
-  '안녕하세요',
-  'Salam',
-  'Merhaba',
-  'Hej',
-  'Ahoj',
-  'Sveiki',
-  'Halo',
-  'Sawasdee',
-  'Shalom',
-  'Yassou',
-  'Selam',
-  'Hallo',
-  'Hei',
-  'Hei',
-  'Hei',
-];
-
-function getTimeString(timezone: string) {
-  return new Date().toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
-
 function AppContent() {
-  const [weather, setWeather] = useState<{ temp: number; desc: string; icon: string } | null>(null);
-  const [dateTime, setDateTime] = useState(new Date());
-  const location = useLocation();
-
-  useEffect(() => {
-    // Update date/time every second
-    const timer = setInterval(() => setDateTime(new Date()), 1000);
-    // Fetch weather from Open-Meteo (no API key required)
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.405&current_weather=true')
-      .then(res => res.json())
-      .then(data => {
-        if (data.current_weather) {
-          setWeather({
-            temp: data.current_weather.temperature,
-            desc: 'Clear',
-            icon: '☀️',
-          });
-        }
-      });
-    return () => clearInterval(timer);
-  }, []);
+  const [todos, setTodos] = useState<TodoCardProps[]>([]);
+  const [editingTodo, setEditingTodo] = useState<TodoCardProps | null>(null);
+  const greetings = [
+    'Hi', 'Hola', 'Bonjour', 'Hallo', 'Ciao', 'Olá', 'Привет', 'नमस्ते', 'こんにちは', '你好', '안녕하세요', 'Salam', 'Merhaba', 'Hej', 'Ahoj', 'Sveiki', 'Halo', 'Sawasdee', 'Shalom', 'Yassou', 'Selam', 'Hallo', 'Hei', 'Hei', 'Hei'
+  ];
   const [greetingIdx, setGreetingIdx] = useState(0);
-
   useEffect(() => {
     const interval = setInterval(() => {
       setGreetingIdx(idx => (idx + 1) % greetings.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
-  const [todos, setTodos] = useState<TodoCardProps[]>([]);
-  const [editingTodo, setEditingTodo] = useState<TodoCardProps | null>(null);
 
-  // Fetch todos from backend
   useEffect(() => {
     fetch(API_URL)
       .then(res => res.json())
       .then(data => setTodos(data));
   }, []);
 
-  // Add new todo
   const handleAdd = (todo: { title: string; description?: string; dueDate?: string }) => {
     fetch(API_URL, {
       method: 'POST',
@@ -92,13 +110,11 @@ function AppContent() {
       .then(newTodo => setTodos(prev => [...prev, newTodo]));
   };
 
-  // Edit todo
   const handleEdit = (id: string) => {
     const todo = todos.find(t => t.id === id);
     if (todo) setEditingTodo(todo);
   };
 
-  // Update todo
   const handleUpdate = (updated: TodoCardProps) => {
     fetch(`${API_URL}/${updated.id}`, {
       method: 'PUT',
@@ -112,13 +128,11 @@ function AppContent() {
       });
   };
 
-  // Delete todo
   const handleDelete = (id: string) => {
     fetch(`${API_URL}/${id}`, { method: 'DELETE' })
       .then(() => setTodos(prev => prev.filter(t => t.id !== id)));
   };
 
-  // Complete/incomplete todo
   const handleComplete = (id: string, completed: boolean) => {
     const completedOn = completed ? new Date().toISOString() : undefined;
     fetch(`${API_URL}/${id}/complete`, {
@@ -131,122 +145,121 @@ function AppContent() {
   };
 
   return (
-    <div className="App" style={{
-      background: 'linear-gradient(135deg, #000000 0%, #1976d2 100%)',
-      minHeight: '100vh',
-      padding: '32px',
-      color: '#FFD700',
-      backgroundBlendMode: 'darken',
-      transition: 'background 0.5s',
-      fontFamily: 'Monotype Corsiva, cursive',
-      position: 'relative'
+    <div style={{
+      width: '100%',
+      maxWidth: 900,
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 36,
+      padding: '32px 32px 32px 32px',
+      boxSizing: 'border-box',
+      minHeight: 'calc(100vh - 64px)',
+      position: 'relative',
     }}>
-      {/* Home button at top right, hidden on main page */}
-      {location.pathname !== '/' && (
-        <Link to="/" style={{ position: 'absolute', top: 24, right: 24, zIndex: 100, background: 'rgba(35,37,38,0.85)', borderRadius: '10px', boxShadow: '0 2px 8px #222', padding: '8px 16px', color: '#FFD700', textDecoration: 'none', fontWeight: 700, fontSize: '1.1em', letterSpacing: '1px', transition: 'background 0.3s', border: '2px solid #FFD700' }}>
-          Home
-        </Link>
+      {/* Top bar: logo, greeting, profile icon */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginBottom: 36,
+        width: '100%',
+        gap: 24,
+      }}>
+        <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: 88, width: 88, borderRadius: 18, boxShadow: '0 4px 16px #222', objectFit: 'cover', marginRight: 16 }} />
+        <div>
+          <div style={{ fontSize: '2em', fontWeight: 700, color: '#FFD700', marginBottom: 4, textShadow: '0 2px 12px #1976d2' }}>{greetings[greetingIdx]} Divya!</div>
+          <div style={{ color: '#1976d2', fontWeight: 700, fontSize: '1.5em', marginBottom: 4, textShadow: '0 2px 12px #FFD700' }}>What's on your mind today?</div>
+        </div>
+      </div>
+      {/* Todo card and list, center and beautify tables */}
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+        <AddTodoForm onAdd={handleAdd} />
+      </div>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <TodoList todos={todos} onEdit={handleEdit} onDelete={handleDelete} onComplete={handleComplete} />
+        </div>
+      </div>
+      {editingTodo && (
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+          <EditTodoForm todo={editingTodo as TodoCardProps} onUpdate={handleUpdate} onCancel={() => setEditingTodo(null)} />
+        </div>
       )}
-      {location.pathname !== '/calendar' && (
-        <>
-          {/* Time widget below weather widget on right side */}
-          <div style={{ position: 'absolute', top: 320, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'left', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
-            <div style={{ fontSize: '1.5em', fontWeight: 700, marginBottom: '12px', color: '#FFD700', letterSpacing: '2px', textAlign: 'center', textShadow: '0 2px 8px #000' }}>World Clocks</div>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇮🇳</span>
-              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Bangalore</span>
-              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Asia/Kolkata')}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="Germany">🇩🇪</span>
-              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Berlin</span>
-              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Europe/Berlin')}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="United States">🇺🇸</span>
-              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Redmond</span>
-              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Los_Angeles')}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇨🇦</span>
-              <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Toronto</span>
-              <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Toronto')}</span>
-            </div>
-          </div>
-          {/* Link just below the widget, not inside */}
-          <div style={{ position: 'absolute', top: 580, right: 32, width: '240px', zIndex: 21, textAlign: 'center' }}>
-            {location.pathname === '/completed' ? (
-              <Link to="/" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
-                Go back
-              </Link>
-            ) : (
-              <>
-                <Link to="/completed" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
-                  Click here for completed tasks
-                </Link>
-                <Link to="/calendar" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
-                  Go to calendar
-                </Link>
-              </>
-            )}
-          </div>
-        </>
-      )}
-<div style={{ position: 'relative', width: '100%' }}>
-  <span style={{
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    color: '#FFD700',
-    fontWeight: 700,
-    fontSize: '2.8em',
-    margin: '24px 0 0 32px',
-    zIndex: 10,
-    textShadow: '0 4px 16px #000',
-    fontFamily: 'Monotype Corsiva, cursive',
-    letterSpacing: '2px',
-    background: 'rgba(35,37,38,0.5)',
-    borderRadius: '12px',
-    padding: '8px 24px',
-    boxShadow: '0 2px 8px #222'
-  }}>{greetings[greetingIdx]} Divya</span>
-</div>
-<div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', width: '100%', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
-  {/* Weather widget and date/time on right side, only if not on /calendar */}
-  {location.pathname !== '/calendar' && (
-    <div style={{ position: 'absolute', top: 32, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'center', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
-      <div style={{ fontSize: '1.1em', fontWeight: 700, marginBottom: '4px', color: '#FFD700', letterSpacing: '1px' }}>Berlin, Germany</div>
-      <div style={{ fontSize: '2em', marginBottom: '8px' }}>{weather ? weather.icon : '⛅'}</div>
-      <div style={{ fontSize: '1.2em', fontWeight: 700 }}>{weather ? `${weather.temp}°C` : 'Loading...'}</div>
-      <div style={{ fontSize: '1em', marginBottom: '8px' }}>{weather ? weather.desc : ''}</div>
-      <div style={{ fontSize: '1em', fontWeight: 500 }}>{dateTime.toLocaleDateString()}</div>
-      <div style={{ fontSize: '1.1em', fontWeight: 700 }}>{dateTime.toLocaleTimeString()}</div>
     </div>
-  )}
-  <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: '96px', width: '96px', marginRight: '24px', borderRadius: '18px', boxShadow: '0 4px 16px #222', objectFit: 'cover' }} />
-  <h1 style={{ color: '#1976d2', marginBottom: '0', fontWeight: 700, textAlign: 'left' }}>What's on your mind today?</h1>
-</div>
-      <Routes>
-        <Route path="/" element={
-          <>
-            <AddTodoForm onAdd={handleAdd} />
-            {editingTodo ? (
-              <EditTodoForm todo={editingTodo} onUpdate={handleUpdate} onCancel={() => setEditingTodo(null)} />
-            ) : null}
-            <TodoList todos={todos} onEdit={handleEdit} onDelete={handleDelete} onComplete={handleComplete} />
-          </>
-        } />
-        <Route path="/completed" element={<CompletedTasks todos={todos} />} />
-  <Route path="/calendar" element={<FullCalendarNotes />} />
-      </Routes>
+  );
+}
+
+function SignupScreen() {
+  const navigate = useNavigate();
+  const handleSignup = (email: string, password: string) => {
+    // Call backend signup API
+    fetch('http://localhost:3000/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message === 'Signup successful') {
+          alert('Account created! Please login.');
+          navigate('/');
+        } else {
+          alert('Signup failed');
+        }
+      })
+      .catch(() => alert('Signup error'));
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
+      <Signup onSignup={handleSignup} onLoginLink={() => navigate('/')} />
+      <WorldClock />
+      <WeatherWidget />
+    </div>
+  );
+}
+
+
+
+function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'row', minHeight: '100vh', background: 'linear-gradient(135deg, #000000 0%, #1976d2 100%)', color: '#FFD700', fontFamily: 'Monotype Corsiva, cursive', border: '8px solid #FFD700', borderRadius: '24px', boxSizing: 'border-box', gap: '48px', padding: '32px 0' }}>
+  <AnimatedDrawerMenu />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '340px', margin: '0 32px' }}>
+        {children}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px', marginTop: '48px', minWidth: '240px' }}>
+        <div style={{ width: 240, height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px #222', borderRadius: '18px', background: 'rgba(35,37,38,0.85)', marginBottom: '16px' }}>
+          <WeatherWidget />
+        </div>
+        <div style={{ width: 240, height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px #222', borderRadius: '18px', background: 'rgba(35,37,38,0.85)' }}>
+          <WorldClock />
+        </div>
+      </div>
     </div>
   );
 }
 
 function App() {
+  const [todos, setTodos] = useState<TodoCardProps[]>([]);
+  useEffect(() => {
+    fetch('http://localhost:3000/tasks')
+      .then(res => res.json())
+      .then(data => setTodos(data));
+  }, []);
+
   return (
     <Router>
-      <AppContent />
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/main" element={<AppLayout><AppContent /></AppLayout>} />
+        <Route path="/completed" element={<AppLayout><CompletedTasksTable todos={todos} /></AppLayout>} />
+        <Route path="/calendar" element={<AppLayout><FullCalendarNotes /></AppLayout>} />
+        <Route path="/profile" element={<AppLayout><ProfileMenu user={{ name: 'Divya', email: 'divya@email.com' }} onUpdate={() => {}} /></AppLayout>} />
+  <Route path="/notes" element={<AppLayout><NotesMenu /></AppLayout>} />
+      </Routes>
     </Router>
   );
 }

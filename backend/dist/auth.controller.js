@@ -16,12 +16,33 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const auth_dto_1 = require("./auth/dto/auth.dto");
+let users = [];
 let AuthController = class AuthController {
+    signup(authDto) {
+        const existing = users.find(u => u.email === authDto.email);
+        if (existing) {
+            return { message: 'Signup failed', error: 'Email already exists' };
+        }
+        users.push({ email: authDto.email, password: authDto.password });
+        return { message: 'Signup successful' };
+    }
     login(authDto) {
-        return { message: 'Login successful', user: authDto };
+        const user = users.find(u => u.email === authDto.email && u.password === authDto.password);
+        if (user) {
+            return { message: 'Login successful', user: authDto };
+        }
+        return { message: 'Login failed', error: 'Invalid credentials' };
     }
 };
 exports.AuthController = AuthController;
+__decorate([
+    (0, common_1.Post)('signup'),
+    (0, swagger_1.ApiOperation)({ summary: 'User signup' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.AuthDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "signup", null);
 __decorate([
     (0, common_1.Post)('login'),
     (0, swagger_1.ApiOperation)({ summary: 'User login' }),
