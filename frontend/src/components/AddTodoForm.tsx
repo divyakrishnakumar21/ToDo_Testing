@@ -11,7 +11,7 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
   const [dueDate, setDueDate] = useState('');
   const [time, setTime] = useState('');
   const [important, setImportant] = useState(false);
-  const [priority, setPriority] = useState('1');
+  const [priority, setPriority] = useState('none');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
     setDueDate('');
     setTime('');
     setImportant(false);
-    setPriority('1');
+  setPriority('none');
   };
 
   return (
