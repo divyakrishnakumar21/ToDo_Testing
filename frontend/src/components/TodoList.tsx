@@ -105,26 +105,34 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
               </tr>
             </thead>
             <tbody>
-              {todos.map((todo: TodoCardProps) => (
-                <tr key={todo.id} style={{ textDecoration: todo.completed ? 'line-through' : 'none', background: '#222' }}>
-                  <td style={{ textAlign: 'center', border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>
-                    <input
-                      type="checkbox"
-                      checked={todo.completed}
-                      onChange={e => onComplete(todo.id, e.target.checked)}
-                    />
-                  </td>
-                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
-                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>
-                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{formatDateTime(todo.dueDate)}</td>
-                  <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>{todo.priority && todo.priority !== 'none' ? todo.priority : 'None'}</td>
-                  <td style={{ border: '1px solid #444', padding: '8px', textAlign: 'center', color: '#FFD700' }}>{todo.important ? '★' : ''}</td>
-                  <td style={{ border: '1px solid #444', padding: '8px', textAlign: 'center' }}>
-                    <button onClick={() => onEdit(todo.id)} style={{ marginRight: '4px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px' }}>Edit</button>
-                    <button onClick={() => onDelete(todo.id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px' }}>Delete</button>
+              {todos.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>
+                    No tasks available
                   </td>
                 </tr>
-              ))}
+              ) : (
+                todos.map((todo: TodoCardProps) => (
+                  <tr key={todo.id} style={{ textDecoration: todo.completed ? 'line-through' : 'none', background: '#222' }}>
+                    <td style={{ textAlign: 'center', border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>
+                      <input
+                        type="checkbox"
+                        checked={todo.completed}
+                        onChange={e => onComplete(todo.id, e.target.checked)}
+                      />
+                    </td>
+                    <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
+                    <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>
+                    <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{formatDateTime(todo.dueDate)}</td>
+                    <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>{todo.priority && todo.priority !== 'none' ? todo.priority : 'None'}</td>
+                    <td style={{ border: '1px solid #444', padding: '8px', textAlign: 'center', color: '#FFD700' }}>{todo.important ? '★' : ''}</td>
+                    <td style={{ border: '1px solid #444', padding: '8px', textAlign: 'center' }}>
+                      <button onClick={() => onEdit(todo.id)} style={{ marginRight: '4px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px' }}>Edit</button>
+                      <button onClick={() => onDelete(todo.id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px' }}>Delete</button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
