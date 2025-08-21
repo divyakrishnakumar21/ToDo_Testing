@@ -35,21 +35,24 @@
 ## Running Frontend and Backend Together
 
 To run both servers at the same time:
-
-1. Open one terminal for the frontend:
-   ```sh
-   cd frontend
-   npm start
    ```
-2. Open another terminal for the backend:
+1. Open another terminal for the backend:
    ```sh
    cd backend
    npm run start:dev
    ```
+
+2. Open one terminal for the frontend:
+   ```sh
+   cd frontend
+   npm start
+
+   Press y to use a different localhost
 
 Both servers must be running simultaneously for the app to work correctly.
 
 ## Notes
 - Make sure both servers are running for full functionality.
 - The backend uses in-memory storage by default (data resets on restart).
-- For API documentation, visit [http://localhost:3000/api](http://localhost:3000/api) after starting the backend.
+- For front end http://localhost:3001/ 
+- For API documentation, visit [http://localhost:3000/api] after starting the backend.
