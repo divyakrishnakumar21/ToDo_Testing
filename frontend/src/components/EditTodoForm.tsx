@@ -10,12 +10,28 @@ interface EditTodoFormProps {
 export const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onUpdate, onCancel }) => {
   const [title, setTitle] = useState(todo.title);
   const [description, setDescription] = useState(todo.description || '');
-  const [dueDate, setDueDate] = useState(todo.dueDate || '');
+  // Split dueDate into date and time if possible
+  let initialDate = '';
+  let initialTime = '';
+  if (todo.dueDate) {
+    const [date, time] = todo.dueDate.split('T');
+    initialDate = date;
+    initialTime = time || '';
+  }
+  const [dueDate, setDueDate] = useState(initialDate);
+  const [time, setTime] = useState(initialTime);
   const [showModal, setShowModal] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdate({ ...todo, title, description, dueDate });
+    let deadline = dueDate;
+    if (dueDate && time) {
+      deadline = `${dueDate}T${time}`;
+    }
+    if (dueDate && !time) {
+      deadline = dueDate;
+    }
+    onUpdate({ ...todo, title, description, dueDate: deadline });
     setShowModal(false);
   };
 
@@ -69,7 +85,11 @@ export const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onUpdate, onCa
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" required style={{ width: '100%', minHeight: '48px', fontSize: '1.1em', marginBottom: '8px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
           <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" style={{ width: '100%', minHeight: '48px', fontSize: '1.1em', marginBottom: '8px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
-          <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{ width: '140px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222', marginBottom: '8px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <span style={{ fontWeight: 500, color: '#FFD700' }}>Select deadline:</span>
+            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{ width: '140px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
+            <input type="time" value={time} onChange={e => setTime(e.target.value)} style={{ width: '100px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
+          </div>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', width: '100%' }}>
             <button type="submit" style={{ cursor: 'pointer', background: 'linear-gradient(90deg, #FFD700 60%, #1976d2 100%)', color: '#232526', border: 'none', borderRadius: '6px', padding: '10px 24px', fontWeight: 700, fontSize: '1.1em', boxShadow: '0 2px 8px #222', letterSpacing: '1px', transition: 'background 0.3s' }}>Update Todo</button>
             <button type="button" onClick={handleCancel} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '6px', padding: '10px 24px', fontWeight: 700, fontSize: '1.1em', boxShadow: '0 2px 8px #222', marginLeft: '8px', cursor: 'pointer' }}>Cancel</button>
