@@ -15,7 +15,7 @@ class AuthDto {
 }
 exports.AuthDto = AuthDto;
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ required: false }),
     __metadata("design:type", String)
 ], AuthDto.prototype, "name", void 0);
 __decorate([

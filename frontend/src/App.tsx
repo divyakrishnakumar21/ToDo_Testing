@@ -17,9 +17,24 @@ import { CompletedTasks as CompletedTasksTable } from './components/CompletedTas
 import FullCalendarNotes from './components/FullCalendarNotes';
 import NotesMenu from './components/NotesMenu';
 
-function LoginPage() {
+import ForgotPassword from './components/ForgotPassword';
+import PrivateRoute from './components/PrivateRoute';
+
+function LoginPage({ setUser }: { setUser: (user: { name: string; email: string }) => void }) {
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState('');
+  useEffect(() => {
+    const storedUser = localStorage.getItem('todo_user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user && user.email) {
+        navigate('/main', { replace: true });
+      }
+    }
+  }, [navigate]);
+
   const handleLogin = (email: string, password: string) => {
     fetch('http://localhost:3000/auth/login', {
       method: 'POST',
@@ -30,6 +45,8 @@ function LoginPage() {
       .then(data => {
         if (data.message === 'Login successful') {
           setLoginError(null);
+          localStorage.setItem('todo_user', JSON.stringify(data.user));
+          setUser(data.user);
           navigate('/main');
         } else {
           setLoginError(data.message || 'Login failed');
@@ -37,9 +54,54 @@ function LoginPage() {
       })
       .catch(() => setLoginError('Network error'));
   };
+
+  const handleForgotPassword = (email: string, password?: string) => {
+    // Prompt for new password
+    const newPassword = window.prompt('Enter your new password:');
+    if (!newPassword) {
+      setForgotMsg('Password reset cancelled.');
+      setTimeout(() => {
+        setForgotMsg('');
+      }, 2000);
+      return;
+    }
+    fetch('http://localhost:3000/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: newPassword })
+    })
+      .then(res => res.json())
+      .then(data => {
+        setForgotMsg(data.message);
+        setTimeout(() => {
+          setShowForgot(false);
+          setForgotMsg('');
+        }, 2500);
+      })
+      .catch(() => {
+        setForgotMsg('Error resetting password.');
+        setTimeout(() => setForgotMsg(''), 2500);
+      });
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
-      <Login onLogin={handleLogin} onCreateAccount={() => navigate('/signup')} loginError={loginError} />
+      {!showForgot ? (
+        <Login
+          onLogin={handleLogin}
+          onCreateAccount={() => navigate('/signup')}
+          onForgotPassword={() => setShowForgot(true)}
+          loginError={loginError}
+        />
+      ) : (
+        <ForgotPassword
+          onSubmit={handleForgotPassword}
+          onCancel={() => setShowForgot(false)}
+        />
+      )}
+      {forgotMsg && (
+        <div style={{ color: '#1976d2', fontWeight: 700, marginTop: 16, background: '#fff', borderRadius: 8, padding: '12px 24px', boxShadow: '0 2px 8px #222' }}>{forgotMsg}</div>
+      )}
       <WorldClock />
       <WeatherWidget />
     </div>
@@ -283,48 +345,42 @@ function App() {
       .then(data => setTodos(data));
   }, []);
 
-  // Custom login page with user state
-  function LoginPageWithUser() {
-    const navigate = useNavigate();
-    const [loginError, setLoginError] = useState<string | null>(null);
-    const handleLogin = (email: string, password: string) => {
-      fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.message === 'Login successful' && data.user) {
-            setLoginError(null);
-            setUser({ name: data.user.name, email: data.user.email });
-            localStorage.setItem('todo_user', JSON.stringify({ name: data.user.name, email: data.user.email }));
-            navigate('/main');
-          } else {
-            setLoginError(data.message || 'Login failed');
-          }
-        })
-        .catch(() => setLoginError('Network error'));
-    };
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
-        <Login onLogin={handleLogin} onCreateAccount={() => navigate('/signup')} loginError={loginError} />
-        <WorldClock />
-        <WeatherWidget />
-      </div>
-    );
-  }
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPageWithUser />} />
+        <Route path="/" element={<LoginPage setUser={setUser} />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/main" element={<AppLayout><AppContent /></AppLayout>} />
-        <Route path="/completed" element={<AppLayout><CompletedTasksTable todos={todos} /></AppLayout>} />
-        <Route path="/calendar" element={<AppLayout><FullCalendarNotes /></AppLayout>} />
-        <Route path="/profile" element={<AppLayout><ProfileMenu user={user || { name: '', email: '' }} onUpdate={() => {}} /></AppLayout>} />
-        <Route path="/notes" element={<AppLayout><NotesMenu /></AppLayout>} />
+        <Route path="/main" element={
+          <PrivateRoute user={user}>
+            <AppLayout><AppContent /></AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/completed" element={
+          <PrivateRoute user={user}>
+            <AppLayout><CompletedTasksTable todos={todos} /></AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/calendar" element={
+          <PrivateRoute user={user}>
+            <AppLayout><FullCalendarNotes /></AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/profile" element={
+          <PrivateRoute user={user}>
+            <AppLayout>
+              <ProfileMenu
+                user={user || { name: '', email: '' }}
+                onUpdate={() => {}}
+              />
+            </AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/notes" element={
+          <PrivateRoute user={user}>
+            <AppLayout><NotesMenu /></AppLayout>
+          </PrivateRoute>
+        } />
       </Routes>
     </Router>
   );

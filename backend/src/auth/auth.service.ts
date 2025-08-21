@@ -9,6 +9,15 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>
   ) {}
+  async resetPassword(email: string, newPassword: string) {
+    const hash = await bcrypt.hash(newPassword, 10);
+    const user = await this.userModel.findOneAndUpdate(
+      { email },
+      { password: hash },
+      { new: true }
+    );
+    return user;
+  }
 
   async signup(name: string, email: string, password: string) {
     const hash = await bcrypt.hash(password, 10);

@@ -168,7 +168,11 @@ const AnimatedDrawerMenu: React.FC = () => {
         ))}
         {/* Logout button */}
         <button
-          onClick={() => { setOpen(false); navigate('/'); }}
+          onClick={() => {
+            setOpen(false);
+            localStorage.removeItem('todo_user');
+            window.location.href = '/';
+          }}
           style={{
             width: '90%',
             height: 48,

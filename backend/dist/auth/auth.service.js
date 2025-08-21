@@ -22,6 +22,11 @@ let AuthService = class AuthService {
     constructor(userModel) {
         this.userModel = userModel;
     }
+    async resetPassword(email, newPassword) {
+        const hash = await bcrypt.hash(newPassword, 10);
+        const user = await this.userModel.findOneAndUpdate({ email }, { password: hash }, { new: true });
+        return user;
+    }
     async signup(name, email, password) {
         const hash = await bcrypt.hash(password, 10);
         const user = new this.userModel({ name, email, password: hash });

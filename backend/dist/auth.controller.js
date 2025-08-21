@@ -18,6 +18,9 @@ const auth_service_1 = require("./auth/auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const auth_dto_1 = require("./auth/dto/auth.dto");
 let AuthController = class AuthController {
+    constructor(authService) {
+        this.authService = authService;
+    }
     async signup(authDto) {
         if (!authDto.email || !authDto.password || !authDto.name) {
             return { message: 'Missing required fields' };
@@ -25,15 +28,25 @@ let AuthController = class AuthController {
         const user = await this.authService.signup(authDto.name, authDto.email, authDto.password);
         return { message: 'Signup successful', user };
     }
-    constructor(authService) {
-        this.authService = authService;
-    }
     async login(authDto) {
+        if (!authDto.email || !authDto.password) {
+            return { message: 'Missing email or password' };
+        }
         const user = await this.authService.validateUser(authDto.email, authDto.password);
         if (!user) {
             return { message: 'Password incorrect' };
         }
         return { message: 'Login successful', user };
+    }
+    async forgotPassword(body) {
+        if (!body.email || !body.password) {
+            return { message: 'Missing email or new password' };
+        }
+        const user = await this.authService.resetPassword(body.email, body.password);
+        if (!user) {
+            return { message: 'User not found' };
+        }
+        return { message: 'Password updated successfully', user };
     }
 };
 exports.AuthController = AuthController;
@@ -53,6 +66,14 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.AuthDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    (0, swagger_1.ApiOperation)({ summary: 'Forgot password (reset)' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

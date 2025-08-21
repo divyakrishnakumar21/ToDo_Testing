@@ -3,6 +3,11 @@ import { User } from './user.schema';
 export declare class AuthService {
     private userModel;
     constructor(userModel: Model<User>);
+    resetPassword(email: string, newPassword: string): Promise<(import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
+        _id: unknown;
+    }> & {
+        __v: number;
+    }) | null>;
     signup(name: string, email: string, password: string): Promise<import("mongoose").Document<unknown, {}, User, {}, {}> & User & Required<{
         _id: unknown;
     }> & {
