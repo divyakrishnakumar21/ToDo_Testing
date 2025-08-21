@@ -22,8 +22,8 @@ let TasksController = class TasksController {
     constructor(tasksService) {
         this.tasksService = tasksService;
     }
-    async findAll() {
-        return this.tasksService.findAll();
+    async findAll(user) {
+        return this.tasksService.findAll(user);
     }
     async findOne(id) {
         return this.tasksService.findOne(id);
@@ -44,9 +44,10 @@ let TasksController = class TasksController {
 exports.TasksController = TasksController;
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'List all tasks' }),
+    (0, swagger_1.ApiOperation)({ summary: 'List all tasks for a user' }),
+    __param(0, (0, common_1.Query)('user')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], TasksController.prototype, "findAll", null);
 __decorate([

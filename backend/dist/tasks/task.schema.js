@@ -18,6 +18,10 @@ exports.Task = Task;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
+], Task.prototype, "user", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
 ], Task.prototype, "title", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),

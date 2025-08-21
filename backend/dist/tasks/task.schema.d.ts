@@ -1,5 +1,6 @@
 import { Document } from 'mongoose';
 export declare class Task extends Document {
+    user: string;
     title: string;
     description?: string;
     dueDate?: Date;

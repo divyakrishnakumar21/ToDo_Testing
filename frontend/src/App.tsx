@@ -182,16 +182,22 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => setTodos(data));
+    const storedUser = localStorage.getItem('todo_user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    if (user && user.email) {
+      fetch(`${API_URL}?user=${encodeURIComponent(user.email)}`)
+        .then(res => res.json())
+        .then(data => setTodos(data));
+    }
   }, []);
 
   const handleAdd = (todo: { title: string; description?: string; dueDate?: string }) => {
+    const storedUser = localStorage.getItem('todo_user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
     fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...todo, completed: false })
+      body: JSON.stringify({ ...todo, completed: false, user: user?.email })
     })
       .then(res => res.json())
       .then(newTodo => setTodos(prev => [...prev, newTodo]));
@@ -256,7 +262,7 @@ function AppContent() {
       }}>
   <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: 88, width: 88, borderRadius: 18, boxShadow: '0 4px 16px #222', objectFit: 'cover', marginRight: 16 }} />
         <div>
-          <div style={{ fontSize: '2em', fontWeight: 700, color: '#FFD700', marginBottom: 4, textShadow: '0 2px 12px #1976d2' }}>{greetings[greetingIdx]} Divya!</div>
+          <div style={{ fontSize: '2em', fontWeight: 700, color: '#FFD700', marginBottom: 4, textShadow: '0 2px 12px #1976d2' }}>{greetings[greetingIdx]} {localStorage.getItem('todo_user') ? JSON.parse(localStorage.getItem('todo_user') || '{}').name : ''}!</div>
           <div style={{ color: '#1976d2', fontWeight: 700, fontSize: '1.5em', marginBottom: 4, textShadow: '0 2px 12px #FFD700' }}>What's on your mind today?</div>
         </div>
       </div>

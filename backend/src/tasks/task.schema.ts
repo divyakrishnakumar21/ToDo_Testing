@@ -4,6 +4,8 @@ import { Document } from 'mongoose';
 @Schema()
 export class Task extends Document {
   @Prop({ required: true })
+  user!: string;
+  @Prop({ required: true })
   title!: string;
 
   @Prop()

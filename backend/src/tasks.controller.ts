@@ -10,9 +10,9 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List all tasks' })
-  async findAll() {
-    return this.tasksService.findAll();
+  @ApiOperation({ summary: 'List all tasks for a user' })
+  async findAll(@Query('user') user: string) {
+    return this.tasksService.findAll(user);
   }
 
   @Get(':id')

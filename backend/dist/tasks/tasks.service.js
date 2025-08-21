@@ -21,8 +21,8 @@ let TasksService = class TasksService {
     constructor(taskModel) {
         this.taskModel = taskModel;
     }
-    async findAll() {
-        return this.taskModel.find().exec();
+    async findAll(user) {
+        return this.taskModel.find({ user }).exec();
     }
     async findOne(id) {
         return this.taskModel.findById(id).exec();
