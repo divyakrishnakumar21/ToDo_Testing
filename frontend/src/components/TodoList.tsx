@@ -83,8 +83,10 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
-        <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', width: '100%' }}>
+      {/* Main container for tables, align and space evenly without changing style values */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px', width: '100%' }}>
+        {/* Row for Important and Today tables, spaced evenly */}
+        <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'flex-start', width: '100%' }}>
           <div style={{ minWidth: '600px', maxWidth: '750px', marginBottom: '32px' }}>
             <h2 style={{ textAlign: 'center', color: '#FFD700' }}>Important Tasks</h2>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: '#181a1b', boxShadow: '0 2px 8px #111', borderRadius: '8px', overflow: 'hidden' }}>
@@ -121,6 +123,8 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
               </tbody>
             </table>
           </div>
+          {/* Spacer between tables */}
+          <div style={{ width: '64px' }} />
           {/* Highlights of today table */}
           <div style={{ minWidth: '600px', maxWidth: '750px', marginBottom: '32px' }}>
             <h2 style={{ textAlign: 'center', color: '#FFD700' }}>Highlights of Today</h2>
@@ -148,7 +152,8 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
             </table>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', width: '100%' }}>
+        {/* Row for All Tasks and Upcoming Tasks tables, spaced evenly */}
+        <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'flex-start', width: '100%' }}>
           <div style={{ flex: 1, minWidth: '600px', maxWidth: '750px' }}>
             <h2 style={{ textAlign: 'center', color: '#FFD700' }}>All Tasks</h2>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: '#181a1b', boxShadow: '0 2px 8px #111', borderRadius: '8px', overflow: 'hidden' }}>
