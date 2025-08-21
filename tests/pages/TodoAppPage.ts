@@ -12,29 +12,28 @@ export class TodoAppPage {
   }
 
   async addTask(title: string, description: string) {
-  await this.page.getByPlaceholder('Title (required)').fill(title);
+    await this.page.getByPlaceholder('Title (required)').fill(title);
     await this.page.getByPlaceholder('Description').fill(description);
     await this.page.getByRole('button', { name: /add/i }).click();
   }
 
-  getTaskRowByTitle(title: string) {
-    // Find the row in the All Tasks table by title
-    return this.page.locator('div').filter({ has: this.page.locator('h2', { hasText: 'All Tasks' }) })
-      .locator('table tbody tr').filter({ has: this.page.getByRole('cell', { name: title }) });
+  async getTaskTitleCell(table: 'all' | 'completed' | 'today', title: string) {
+    // Find the row by matching the cell text in any table
+    const row = await this.page.locator(`tr`).filter({ has: this.page.getByRole('cell', { name: title }) }).first();
+    return row.locator('td').first();
   }
 
-  async getTaskTitleCell(title: string) {
-    // Get the cell for the task title in All Tasks table
-    return this.getTaskRowByTitle(title).locator('td').nth(1);
+  async getTaskRowByTitle(table: 'all' | 'completed' | 'today', title: string) {
+    return this.page.locator(`tr`).filter({ has: this.page.getByRole('cell', { name: title }) }).first();
   }
 
   async completeTask(title: string) {
-  const row = this.getTaskRowByTitle(title);
-  await row.locator('input[type="checkbox"]').first().check();
+    const row = await this.getTaskRowByTitle('all', title);
+    await row.locator('input[type="checkbox"]').first().click();
   }
 
   async deleteTask(title: string) {
-    const row = this.getTaskRowByTitle(title);
+    const row = await this.getTaskRowByTitle('all', title);
     await row.locator('button', { hasText: 'Delete' }).click();
   }
 }

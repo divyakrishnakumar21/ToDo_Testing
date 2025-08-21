@@ -19,13 +19,17 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
     if (dueDate && time) {
       deadline = `${dueDate}T${time}`;
     }
+    // If only date is selected, do not append time
+    if (dueDate && !time) {
+      deadline = dueDate;
+    }
     onAdd({ title, description, dueDate: deadline, important, priority });
     setTitle('');
     setDescription('');
     setDueDate('');
     setTime('');
     setImportant(false);
-  setPriority('none');
+    setPriority('none');
   };
 
   return (
@@ -83,7 +87,7 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', width: '100%' }}>
-          <button type="submit" style={{ background: 'linear-gradient(90deg, #FFD700 60%, #1976d2 100%)', color: '#232526', border: 'none', borderRadius: '6px', padding: '10px 24px', fontWeight: 700, fontSize: '1.1em', boxShadow: '0 2px 8px #222', letterSpacing: '1px', transition: 'background 0.3s' }}>Add Todo</button>
+          <button type="submit" style={{ cursor: 'pointer', background: 'linear-gradient(90deg, #FFD700 60%, #1976d2 100%)', color: '#232526', border: 'none', borderRadius: '6px', padding: '10px 24px', fontWeight: 700, fontSize: '1.1em', boxShadow: '0 2px 8px #222', letterSpacing: '1px', transition: 'background 0.3s' }}>Add Todo</button>
         </div>
       </form>
     </div>

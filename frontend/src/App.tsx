@@ -1,9 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { TodoList } from './components/TodoList';
 import { AddTodoForm } from './components/AddTodoForm';
 import { EditTodoForm } from './components/EditTodoForm';
 import { TodoCardProps } from './components/TodoCard';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { CompletedTasks } from './components/CompletedTasks';
 
 const API_URL = 'http://localhost:3000/tasks';
 
@@ -39,9 +40,10 @@ function getTimeString(timezone: string) {
   return new Date().toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function App() {
+function AppContent() {
   const [weather, setWeather] = useState<{ temp: number; desc: string; icon: string } | null>(null);
   const [dateTime, setDateTime] = useState(new Date());
+  const location = useLocation();
 
   useEffect(() => {
     // Update date/time every second
@@ -137,76 +139,95 @@ function App() {
       fontFamily: 'Monotype Corsiva, cursive',
       position: 'relative'
     }}>
-    {/* Time widget below weather widget on right side */}
-  <div style={{ position: 'absolute', top: 320, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'left', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
-        <div style={{ fontSize: '1.5em', fontWeight: 700, marginBottom: '12px', color: '#FFD700', letterSpacing: '2px', textAlign: 'center', textShadow: '0 2px 8px #000' }}>World Clocks</div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇮🇳</span>
-          <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Bangalore</span>
-          <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Asia/Kolkata')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="Germany">🇩🇪</span>
-          <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Berlin</span>
-          <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Europe/Berlin')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="United States">🇺🇸</span>
-          <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Redmond</span>
-          <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Los_Angeles')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇨🇦</span>
-          <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Toronto</span>
-          <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Toronto')}</span>
-        </div>
+      {/* Time widget below weather widget on right side */}
+    <div style={{ position: 'absolute', top: 320, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'left', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
+      <div style={{ fontSize: '1.5em', fontWeight: 700, marginBottom: '12px', color: '#FFD700', letterSpacing: '2px', textAlign: 'center', textShadow: '0 2px 8px #000' }}>World Clocks</div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+        <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇮🇳</span>
+        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Bangalore</span>
+        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Asia/Kolkata')}</span>
       </div>
-  <div style={{ position: 'relative', width: '100%' }}>
-        <span style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          color: '#FFD700',
-          fontWeight: 700,
-          fontSize: '2.8em',
-          margin: '24px 0 0 32px',
-          zIndex: 10,
-          textShadow: '0 4px 16px #000',
-          fontFamily: 'Monotype Corsiva, cursive',
-          letterSpacing: '2px',
-          background: 'rgba(35,37,38,0.5)',
-          borderRadius: '12px',
-          padding: '8px 24px',
-          boxShadow: '0 2px 8px #222'
-        }}>{greetings[greetingIdx]} Divya</span>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+        <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="Germany">🇩🇪</span>
+        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Berlin</span>
+        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('Europe/Berlin')}</span>
       </div>
-  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', width: '100%', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
-      {/* Weather widget and date/time on right side */}
-  <div style={{ position: 'absolute', top: 32, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'center', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
-        <div style={{ fontSize: '1.1em', fontWeight: 700, marginBottom: '4px', color: '#FFD700', letterSpacing: '1px' }}>Berlin, Germany</div>
-        <div style={{ fontSize: '2em', marginBottom: '8px' }}>{weather ? weather.icon : '⛅'}</div>
-        <div style={{ fontSize: '1.2em', fontWeight: 700 }}>{weather ? `${weather.temp}°C` : 'Loading...'}</div>
-        <div style={{ fontSize: '1em', marginBottom: '8px' }}>{weather ? weather.desc : ''}</div>
-        <div style={{ fontSize: '1em', fontWeight: 500 }}>{dateTime.toLocaleDateString()}</div>
-        <div style={{ fontSize: '1.1em', fontWeight: 700 }}>{dateTime.toLocaleTimeString()}</div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }} role="img" aria-label="United States">🇺🇸</span>
+        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Redmond</span>
+        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Los_Angeles')}</span>
       </div>
-        <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: '96px', width: '96px', marginRight: '24px', borderRadius: '18px', boxShadow: '0 4px 16px #222', objectFit: 'cover' }} />
-        <h1 style={{ color: '#1976d2', marginBottom: '0', fontWeight: 700, textAlign: 'left' }}>What's on your mind today?</h1>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <span style={{ fontSize: '1.2em', fontWeight: 700, marginRight: '10px' }}>🇨🇦</span>
+        <span style={{ fontSize: '1.1em', fontWeight: 700, marginRight: '10px' }}>Toronto</span>
+        <span style={{ fontSize: '1.2em', fontWeight: 700 }}>{getTimeString('America/Toronto')}</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'center', marginBottom: '16px', width: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
-  <AddTodoForm onAdd={handleAdd} />
-      </div>
-      {editingTodo ? (
-        <EditTodoForm todo={editingTodo} onUpdate={handleUpdate} />
+    </div>
+    {/* Link just below the widget, not inside */}
+    <div style={{ position: 'absolute', top: 580, right: 32, width: '240px', zIndex: 21, textAlign: 'center' }}>
+      {location.pathname === '/completed' ? (
+        <Link to="/" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
+          Go back
+        </Link>
       ) : (
-        <TodoList
-          todos={todos}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onComplete={handleComplete}
-        />
+        <Link to="/completed" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'underline', marginTop: '12px', display: 'block', cursor: 'pointer' }}>
+          Click here for completed tasks
+        </Link>
       )}
     </div>
+<div style={{ position: 'relative', width: '100%' }}>
+  <span style={{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    color: '#FFD700',
+    fontWeight: 700,
+    fontSize: '2.8em',
+    margin: '24px 0 0 32px',
+    zIndex: 10,
+    textShadow: '0 4px 16px #000',
+    fontFamily: 'Monotype Corsiva, cursive',
+    letterSpacing: '2px',
+    background: 'rgba(35,37,38,0.5)',
+    borderRadius: '12px',
+    padding: '8px 24px',
+    boxShadow: '0 2px 8px #222'
+  }}>{greetings[greetingIdx]} Divya</span>
+</div>
+<div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', width: '100%', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
+  {/* Weather widget and date/time on right side */}
+<div style={{ position: 'absolute', top: 32, right: 32, background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)', borderRadius: '20px', boxShadow: '0 4px 16px #222', padding: '24px 32px', color: '#FFD700', minWidth: '240px', textAlign: 'center', zIndex: 20, border: '2px solid #FFD700', fontFamily: 'Monotype Corsiva, cursive' }}>
+      <div style={{ fontSize: '1.1em', fontWeight: 700, marginBottom: '4px', color: '#FFD700', letterSpacing: '1px' }}>Berlin, Germany</div>
+      <div style={{ fontSize: '2em', marginBottom: '8px' }}>{weather ? weather.icon : '⛅'}</div>
+      <div style={{ fontSize: '1.2em', fontWeight: 700 }}>{weather ? `${weather.temp}°C` : 'Loading...'}</div>
+      <div style={{ fontSize: '1em', marginBottom: '8px' }}>{weather ? weather.desc : ''}</div>
+      <div style={{ fontSize: '1em', fontWeight: 500 }}>{dateTime.toLocaleDateString()}</div>
+      <div style={{ fontSize: '1.1em', fontWeight: 700 }}>{dateTime.toLocaleTimeString()}</div>
+    </div>
+      <img src={require('./Logo/ToDoAppLogo.png')} alt="Todo App Logo" style={{ height: '96px', width: '96px', marginRight: '24px', borderRadius: '18px', boxShadow: '0 4px 16px #222', objectFit: 'cover' }} />
+      <h1 style={{ color: '#1976d2', marginBottom: '0', fontWeight: 700, textAlign: 'left' }}>What's on your mind today?</h1>
+    </div>
+      <Routes>
+        <Route path="/" element={
+          <>
+            <AddTodoForm onAdd={handleAdd} />
+            {editingTodo ? (
+              <EditTodoForm todo={editingTodo} onUpdate={handleUpdate} onCancel={() => setEditingTodo(null)} />
+            ) : null}
+            <TodoList todos={todos} onEdit={handleEdit} onDelete={handleDelete} onComplete={handleComplete} />
+          </>
+        } />
+        <Route path="/completed" element={<CompletedTasks todos={todos} />} />
+      </Routes>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

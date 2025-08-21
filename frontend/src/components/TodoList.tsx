@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TodoCardProps } from './TodoCard';
 
@@ -11,6 +10,7 @@ interface TodoListProps {
 
 export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onComplete }) => {
   const [sortType, setSortType] = useState<'date' | 'name' | 'priority-low-high' | 'priority-high-low'>('date');
+  const [removingIds, setRemovingIds] = useState<string[]>([]);
   const importantTasks = todos.filter((todo: TodoCardProps) => todo.important);
   const upcoming = todos.filter((todo: TodoCardProps) => !todo.completed);
 
@@ -44,50 +44,104 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
   // Helper to display date and time
   const formatDateTime = (dt?: string) => {
     if (!dt) return 'No date';
+    // If dt is only a date string (YYYY-MM-DD), show only date
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dt)) {
+      const dateObj = new Date(dt);
+      return dateObj.toLocaleDateString();
+    }
+    // Otherwise, show date and time
     const dateObj = new Date(dt);
     const dateStr = dateObj.toLocaleDateString();
     const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     return `${dateStr} ${timeStr}`;
   };
 
+  const today = new Date();
+  const todayTasks = todos.filter((todo: TodoCardProps) => {
+    if (!todo.dueDate) return false;
+    const due = new Date(todo.dueDate);
+    return due.getFullYear() === today.getFullYear() &&
+      due.getMonth() === today.getMonth() &&
+      due.getDate() === today.getDate();
+  });
+
+  const handleCompleteWithAnimation = (id: string, completed: boolean) => {
+    if (completed) {
+      setRemovingIds(prev => [...prev, id]);
+      setTimeout(() => {
+        onComplete(id, completed);
+        setRemovingIds(prev => prev.filter(rid => rid !== id));
+      }, 700); // 700ms animation
+    } else {
+      onComplete(id, completed);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
-      <div style={{ minWidth: '600px', maxWidth: '750px', marginBottom: '32px' }}>
-        <h2 style={{ textAlign: 'center', color: '#FFD700' }}>Important Tasks</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#181a1b', boxShadow: '0 2px 8px #111', borderRadius: '8px', overflow: 'hidden' }}>
-          <thead style={{ background: '#FFD700', color: '#181a1b' }}>
-            <tr>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Title</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Description</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Due Date</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Priority</th>
-            </tr>
-          </thead>
-          <tbody>
-            {importantTasks.length === 0 ? (
-              <tr><td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>No important tasks</td></tr>
-            ) : importantTasks.map((todo: TodoCardProps) => (
-              <tr key={todo.id} style={{ background: '#222' }}>
-                <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
-                <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>
-                <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{formatDateTime(todo.dueDate)}</td>
-
-                <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>
-                  {(() => {
-                    switch ((todo.priority || '').toLowerCase()) {
-                      case 'critical': return 'Critical';
-                      case 'high': return 'High';
-                      case 'medium': return 'Medium';
-                      case 'low': return 'Low';
-                      case 'verylow': return 'Very Low';
-                      default: return 'None';
-                    }
-                  })()}
-                </td>
+      <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', width: '100%' }}>
+        <div style={{ minWidth: '600px', maxWidth: '750px', marginBottom: '32px' }}>
+          <h2 style={{ textAlign: 'center', color: '#FFD700' }}>Important Tasks</h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: '#181a1b', boxShadow: '0 2px 8px #111', borderRadius: '8px', overflow: 'hidden' }}>
+            <thead style={{ background: '#FFD700', color: '#181a1b' }}>
+              <tr>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Title</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Description</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Due Date</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Priority</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {importantTasks.length === 0 ? (
+                <tr><td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>No important tasks</td></tr>
+              ) : importantTasks.map((todo: TodoCardProps) => (
+                  <tr key={todo.id} data-testid={`important-row-${todo.id}-${todo.title.replace(/\s+/g, '-')}`} style={{ background: '#222' }}>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{formatDateTime(todo.dueDate)}</td>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>
+                    {(() => {
+                      switch ((todo.priority || '').toLowerCase()) {
+                        case 'critical': return 'Critical';
+                        case 'high': return 'High';
+                        case 'medium': return 'Medium';
+                        case 'low': return 'Low';
+                        case 'verylow': return 'Very Low';
+                        default: return 'None';
+                      }
+                    })()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* Highlights of today table */}
+        <div style={{ minWidth: '600px', maxWidth: '750px', marginBottom: '32px' }}>
+          <h2 style={{ textAlign: 'center', color: '#FFD700' }}>Highlights of Today</h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: '#181a1b', boxShadow: '0 2px 8px #111', borderRadius: '8px', overflow: 'hidden' }}>
+            <thead style={{ background: '#FFD700', color: '#181a1b' }}>
+              <tr>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Title</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Description</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Due Date</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              {todayTasks.length === 0 ? (
+                <tr><td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>No tasks for today</td></tr>
+              ) : todayTasks.map((todo: TodoCardProps) => (
+                  <tr key={todo.id} data-testid={`today-row-${todo.id}-${todo.title.replace(/\s+/g, '-')}`} style={{ background: '#222' }}>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{formatDateTime(todo.dueDate)}</td>
+                  <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>{todo.priority && todo.priority !== 'none' ? todo.priority : 'None'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', width: '100%' }}>
         <div style={{ flex: 1, minWidth: '600px', maxWidth: '750px' }}>
@@ -105,20 +159,26 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
               </tr>
             </thead>
             <tbody>
-              {todos.length === 0 ? (
+              {todos.filter(todo => !todo.completed).length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>
                     No tasks available
                   </td>
                 </tr>
               ) : (
-                todos.map((todo: TodoCardProps) => (
-                  <tr key={todo.id} style={{ textDecoration: todo.completed ? 'line-through' : 'none', background: '#222' }}>
+                todos.filter(todo => !todo.completed || removingIds.includes(todo.id)).map((todo: TodoCardProps) => (
+                    <tr key={todo.id} data-testid={`task-row-${todo.id}-${todo.title.replace(/\s+/g, '-')}`} style={{
+                    background: '#222',
+                    textDecoration: todo.completed || removingIds.includes(todo.id) ? 'line-through' : 'none',
+                    opacity: removingIds.includes(todo.id) ? 0.3 : 1,
+                    transition: 'opacity 0.7s'
+                  }}>
                     <td style={{ textAlign: 'center', border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>
                       <input
                         type="checkbox"
                         checked={todo.completed}
-                        onChange={e => onComplete(todo.id, e.target.checked)}
+                        onChange={e => handleCompleteWithAnimation(todo.id, e.target.checked)}
+                        style={{ cursor: 'pointer' }}
                       />
                     </td>
                     <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
@@ -127,8 +187,8 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
                     <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>{todo.priority && todo.priority !== 'none' ? todo.priority : 'None'}</td>
                     <td style={{ border: '1px solid #444', padding: '8px', textAlign: 'center', color: '#FFD700' }}>{todo.important ? '★' : ''}</td>
                     <td style={{ border: '1px solid #444', padding: '8px', textAlign: 'center' }}>
-                      <button onClick={() => onEdit(todo.id)} style={{ marginRight: '4px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px' }}>Edit</button>
-                      <button onClick={() => onDelete(todo.id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px' }}>Delete</button>
+                      <button onClick={() => onEdit(todo.id)} style={{ marginRight: '4px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}>Edit</button>
+                      <button onClick={() => onDelete(todo.id)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}>Delete</button>
                     </td>
                   </tr>
                 ))
