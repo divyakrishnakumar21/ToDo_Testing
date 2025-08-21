@@ -267,22 +267,64 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
 function App() {
   const [todos, setTodos] = useState<TodoCardProps[]>([]);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  // Load user from localStorage on app start
+  useEffect(() => {
+    const storedUser = localStorage.getItem('todo_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   useEffect(() => {
     fetch('http://localhost:3000/tasks')
       .then(res => res.json())
       .then(data => setTodos(data));
   }, []);
 
+  // Custom login page with user state
+  function LoginPageWithUser() {
+    const navigate = useNavigate();
+    const [loginError, setLoginError] = useState<string | null>(null);
+    const handleLogin = (email: string, password: string) => {
+      fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.message === 'Login successful' && data.user) {
+            setLoginError(null);
+            setUser({ name: data.user.name, email: data.user.email });
+            localStorage.setItem('todo_user', JSON.stringify({ name: data.user.name, email: data.user.email }));
+            navigate('/main');
+          } else {
+            setLoginError(data.message || 'Login failed');
+          }
+        })
+        .catch(() => setLoginError('Network error'));
+    };
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 60%, #1976d2 100%)' }}>
+        <Login onLogin={handleLogin} onCreateAccount={() => navigate('/signup')} loginError={loginError} />
+        <WorldClock />
+        <WeatherWidget />
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LoginPageWithUser />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/main" element={<AppLayout><AppContent /></AppLayout>} />
         <Route path="/completed" element={<AppLayout><CompletedTasksTable todos={todos} /></AppLayout>} />
         <Route path="/calendar" element={<AppLayout><FullCalendarNotes /></AppLayout>} />
-        <Route path="/profile" element={<AppLayout><ProfileMenu user={{ name: 'Divya', email: 'divya@email.com' }} onUpdate={() => {}} /></AppLayout>} />
-  <Route path="/notes" element={<AppLayout><NotesMenu /></AppLayout>} />
+        <Route path="/profile" element={<AppLayout><ProfileMenu user={user || { name: '', email: '' }} onUpdate={() => {}} /></AppLayout>} />
+        <Route path="/notes" element={<AppLayout><NotesMenu /></AppLayout>} />
       </Routes>
     </Router>
   );
