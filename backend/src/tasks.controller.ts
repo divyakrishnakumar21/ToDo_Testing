@@ -48,10 +48,15 @@ export class TasksController {
 
   @Put(':id/complete')
   @ApiOperation({ summary: 'Mark task as complete/incomplete' })
-  complete(@Param('id') id: string, @Body('completed') completed: boolean) {
+  complete(@Param('id') id: string, @Body() body: { completed: boolean, completedOn?: string }) {
     const task = this.tasks.find(t => t.id === id);
     if (!task) return { error: 'Task not found' };
-    task.completed = completed;
+    task.completed = body.completed;
+    if (body.completed) {
+      task.completedOn = body.completedOn || new Date().toISOString();
+    } else {
+      task.completedOn = undefined;
+    }
     return task;
   }
 }

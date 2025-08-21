@@ -33,7 +33,7 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
   };
 
   return (
-    <div style={{
+    <div className="card-animate" style={{
       background: 'linear-gradient(135deg, #232526 60%, #1a1a1a 100%)',
       padding: '32px 28px',
       borderRadius: '18px',
@@ -45,7 +45,8 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
       outline: '2px solid #444',
       outlineOffset: '-8px',
       position: 'relative',
-      zIndex: 2
+      zIndex: 2,
+      transition: 'box-shadow 0.3s, transform 0.3s',
     }}>
       <h2 style={{
         color: '#FFD700',
@@ -59,18 +60,19 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
         paddingBottom: '10px',
         borderRadius: '8px',
         background: 'rgba(35,37,38,0.7)',
-        boxShadow: '0 2px 8px #222'
+        boxShadow: '0 2px 8px #222',
+        animation: 'cardFadeIn 0.7s cubic-bezier(.4,0,.2,1)'
       }}>Add your ToDo Tasks</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', width: '100%' }}>
         <div style={{ width: '100%' }}>
-          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title (required)" required style={{ width: '100%', minHeight: '48px', fontSize: '1.1em', marginBottom: '8px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
+          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title (required)" required style={{ width: '100%', minHeight: '48px', fontSize: '1.1em', marginBottom: '8px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222', transition: 'box-shadow 0.3s, border 0.3s' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span style={{ cursor: 'pointer', fontSize: '1.3em', color: important ? '#FFD700' : '#bbb', textShadow: important ? '0 0 8px #FFD700' : 'none' }} onClick={() => setImportant(v => !v)} title="Mark Important">★</span>
+            <span style={{ cursor: 'pointer', fontSize: '1.3em', color: important ? '#FFD700' : '#bbb', textShadow: important ? '0 0 8px #FFD700' : 'none', transition: 'color 0.3s, text-shadow 0.3s' }} onClick={() => setImportant(v => !v)} title="Mark Important">★</span>
             <span style={{ fontWeight: 500, color: '#FFD700' }}>Mark Important</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <span style={{ fontWeight: 500, color: '#FFD700' }}>Priority:</span>
-            <select value={priority} onChange={e => setPriority(e.target.value)} style={{ fontSize: '1em', padding: '4px', borderRadius: '4px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700' }}>
+            <select value={priority} onChange={e => setPriority(e.target.value)} style={{ fontSize: '1em', padding: '4px', borderRadius: '4px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', transition: 'border 0.3s' }}>
               <option value="none">None</option>
               <option value="critical">Critical</option>
               <option value="high">High</option>
@@ -79,15 +81,15 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAdd }) => {
               <option value="verylow">Very Low</option>
             </select>
           </div>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" style={{ width: '100%', minHeight: '48px', fontSize: '1.1em', marginBottom: '8px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" style={{ width: '100%', minHeight: '48px', fontSize: '1.1em', marginBottom: '8px', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222', transition: 'box-shadow 0.3s, border 0.3s' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 500, color: '#FFD700' }}>Select deadline:</span>
-              <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{ width: '140px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
-              <input type="time" value={time} onChange={e => setTime(e.target.value)} style={{ width: '100px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222' }} />
+              <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{ width: '140px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222', transition: 'box-shadow 0.3s, border 0.3s' }} />
+              <input type="time" value={time} onChange={e => setTime(e.target.value)} style={{ width: '100px', fontSize: '1em', background: '#232526', color: '#FFD700', border: '1.5px solid #FFD700', borderRadius: '6px', boxShadow: '0 1px 4px #222', transition: 'box-shadow 0.3s, border 0.3s' }} />
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', width: '100%' }}>
-          <button type="submit" style={{ cursor: 'pointer', background: 'linear-gradient(90deg, #FFD700 60%, #1976d2 100%)', color: '#232526', border: 'none', borderRadius: '6px', padding: '10px 24px', fontWeight: 700, fontSize: '1.1em', boxShadow: '0 2px 8px #222', letterSpacing: '1px', transition: 'background 0.3s' }}>Add Todo</button>
+          <button type="submit" className="button-animate" style={{ cursor: 'pointer', background: 'linear-gradient(90deg, #FFD700 60%, #1976d2 100%)', color: '#232526', border: 'none', borderRadius: '6px', padding: '10px 24px', fontWeight: 700, fontSize: '1.1em', boxShadow: '0 2px 8px #222', letterSpacing: '1px', transition: 'background 0.3s, box-shadow 0.3s, transform 0.2s' }}>Add Todo</button>
         </div>
       </form>
     </div>

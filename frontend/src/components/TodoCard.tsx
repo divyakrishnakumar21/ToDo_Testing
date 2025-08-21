@@ -21,19 +21,30 @@ export const TodoCard: React.FC<TodoCardProps> = ({ id, title, description, dueD
     dueDateDisplay = `${dateStr} ${timeStr}`;
   }
   return (
-    <div style={{ border: '1px solid #ccc', margin: '8px', padding: '8px', display: 'flex', alignItems: 'center' }}>
+    <div className="card-animate" style={{
+      border: '2px solid #FFD700',
+      margin: '12px',
+      padding: '18px',
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: '12px',
+      background: 'linear-gradient(135deg, #232526 60%, #1a1a1a 100%)',
+      boxShadow: '0 2px 12px #222',
+      transition: 'box-shadow 0.3s, transform 0.3s',
+      animation: 'cardFadeIn 0.7s cubic-bezier(.4,0,.2,1)'
+    }}>
       <input
         type="checkbox"
         checked={completed}
         onChange={e => onComplete && onComplete(id, e.target.checked)}
-        style={{ marginRight: '12px' }}
+        style={{ marginRight: '18px', accentColor: '#FFD700', width: '22px', height: '22px', cursor: 'pointer', transition: 'accent-color 0.3s' }}
       />
       <div style={{ flex: 1 }}>
-        <h3 style={{ textDecoration: completed ? 'line-through' : 'none' }}>{title}</h3>
-        <p style={{ textDecoration: completed ? 'line-through' : 'none', marginBottom: '8px' }}>{description}</p>
-        <p>Due: {dueDateDisplay}</p>
-        {important && <span style={{ color: '#FFD700', fontWeight: 700 }}>★ Important</span>}
-        <span style={{ marginLeft: '12px', color: '#1976d2' }}>
+        <h3 style={{ textDecoration: completed ? 'line-through' : 'none', color: '#FFD700', fontWeight: 700, fontSize: '1.3em', marginBottom: '6px', letterSpacing: '1px', transition: 'color 0.3s' }}>{title}</h3>
+        <p style={{ textDecoration: completed ? 'line-through' : 'none', marginBottom: '8px', color: '#f5f5f5', fontSize: '1em', transition: 'color 0.3s' }}>{description}</p>
+        <p style={{ color: '#FFD700', fontWeight: 500, fontSize: '1em', marginBottom: '4px' }}>Due: {dueDateDisplay}</p>
+        {important && <span style={{ color: '#FFD700', fontWeight: 700, fontSize: '1.1em', marginRight: '12px', textShadow: '0 0 8px #FFD700' }}>★ Important</span>}
+        <span style={{ marginLeft: '12px', color: '#1976d2', fontWeight: 700, fontSize: '1.1em' }}>
           Priority: {(() => {
             switch ((priority || '').toLowerCase()) {
               case 'critical': return 'Critical';

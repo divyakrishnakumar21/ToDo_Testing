@@ -16,17 +16,19 @@ export const CompletedTasks: React.FC<CompletedTasksProps> = ({ todos }) => {
             <th style={{ padding: '10px', border: '1px solid #444' }}>Description</th>
             <th style={{ padding: '10px', border: '1px solid #444' }}>Due Date</th>
             <th style={{ padding: '10px', border: '1px solid #444' }}>Priority</th>
+            <th style={{ padding: '10px', border: '1px solid #444' }}>Completed On</th>
           </tr>
         </thead>
         <tbody>
           {todos.filter(todo => todo.completed).length === 0 ? (
-            <tr><td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>No completed tasks</td></tr>
+            <tr><td colSpan={5} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>No completed tasks</td></tr>
           ) : todos.filter(todo => todo.completed).map((todo: TodoCardProps) => (
             <tr key={todo.id} style={{ background: '#222' }}>
               <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
               <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>
               <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.dueDate ? new Date(todo.dueDate).toLocaleString() : 'No date'}</td>
               <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>{todo.priority && todo.priority !== 'none' ? todo.priority : 'None'}</td>
+              <td style={{ border: '1px solid #444', padding: '8px', color: '#FFD700' }}>{(todo as any).completedOn ? new Date((todo as any).completedOn).toLocaleString() : 'N/A'}</td>
             </tr>
           ))}
         </tbody>

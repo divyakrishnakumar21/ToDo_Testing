@@ -119,10 +119,11 @@ function AppContent() {
 
   // Complete/incomplete todo
   const handleComplete = (id: string, completed: boolean) => {
+    const completedOn = completed ? new Date().toISOString() : undefined;
     fetch(`${API_URL}/${id}/complete`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed })
+      body: JSON.stringify({ completed, completedOn })
     })
       .then(res => res.json())
       .then(updated => setTodos(prev => prev.map(t => t.id === updated.id ? updated : t)));

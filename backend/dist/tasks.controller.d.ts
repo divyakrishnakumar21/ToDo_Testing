@@ -13,5 +13,8 @@ export declare class TasksController {
     remove(id: string): {
         deleted: boolean;
     };
-    complete(id: string, completed: boolean): any;
+    complete(id: string, body: {
+        completed: boolean;
+        completedOn?: string;
+    }): any;
 }

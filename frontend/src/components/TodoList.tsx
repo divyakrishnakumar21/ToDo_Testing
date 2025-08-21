@@ -9,7 +9,7 @@ interface TodoListProps {
 }
 
 export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onComplete }) => {
-  const [sortType, setSortType] = useState<'date' | 'name' | 'priority-low-high' | 'priority-high-low'>('date');
+  const [sortType, setSortType] = useState<'date' | 'name' | 'priority-low-high' | 'priority-high-low' | 'recent'>('date');
   const [removingIds, setRemovingIds] = useState<string[]>([]);
   const importantTasks = todos.filter((todo: TodoCardProps) => todo.important);
   const upcoming = todos.filter((todo: TodoCardProps) => !todo.completed);
@@ -36,10 +36,14 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
       return (priorityOrder[b.priority?.toLowerCase() || 'none'] - priorityOrder[a.priority?.toLowerCase() || 'none']);
     } else if (sortType === 'name') {
       return a.title.localeCompare(b.title);
+    } else if (sortType === 'recent') {
+      // Sort by most recently added (assuming todos are ordered by creation, newest last)
+      return 0; // No sort needed, just reverse the array below
     } else {
       return 0;
     }
   });
+  const finalUpcoming = sortType === 'recent' ? [...sortedUpcoming].reverse() : sortedUpcoming;
 
   // Helper to display date and time
   const formatDateTime = (dt?: string) => {
@@ -204,6 +208,7 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
               <option value="name">Sort by name</option>
               <option value="priority-low-high">Sort by priority (Low to High)</option>
               <option value="priority-high-low">Sort by priority (High to Low)</option>
+              <option value="recent">Sort by Recently added</option>
             </select>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', background: '#181a1b', boxShadow: '0 2px 8px #111', borderRadius: '8px', overflow: 'hidden', marginBottom: '32px' }}>
@@ -216,9 +221,9 @@ export const TodoList: React.FC<TodoListProps> = ({ todos, onEdit, onDelete, onC
               </tr>
             </thead>
             <tbody>
-              {sortedUpcoming.length === 0 ? (
+              {finalUpcoming.length === 0 ? (
                 <tr><td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: '#888' }}>All tasks completed!</td></tr>
-              ) : sortedUpcoming.map((todo: TodoCardProps) => (
+              ) : finalUpcoming.map((todo: TodoCardProps) => (
                 <tr key={todo.id} style={{ background: '#222' }}>
                   <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.title}</td>
                   <td style={{ border: '1px solid #444', padding: '8px', color: '#f5f5f5' }}>{todo.description}</td>

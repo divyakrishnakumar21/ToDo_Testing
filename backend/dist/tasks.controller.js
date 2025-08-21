@@ -45,11 +45,17 @@ let TasksController = class TasksController {
         this.tasks = this.tasks.filter(t => t.id !== id);
         return { deleted: true };
     }
-    complete(id, completed) {
+    complete(id, body) {
         const task = this.tasks.find(t => t.id === id);
         if (!task)
             return { error: 'Task not found' };
-        task.completed = completed;
+        task.completed = body.completed;
+        if (body.completed) {
+            task.completedOn = body.completedOn || new Date().toISOString();
+        }
+        else {
+            task.completedOn = undefined;
+        }
         return task;
     }
 };
@@ -99,9 +105,9 @@ __decorate([
     (0, common_1.Put)(':id/complete'),
     (0, swagger_1.ApiOperation)({ summary: 'Mark task as complete/incomplete' }),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)('completed')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Boolean]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "complete", null);
 exports.TasksController = TasksController = __decorate([
