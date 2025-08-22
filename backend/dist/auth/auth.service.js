@@ -14,18 +14,47 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
+const email_service_1 = require("./email.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const user_schema_1 = require("./user.schema");
 const bcrypt = require("bcryptjs");
 let AuthService = class AuthService {
-    constructor(userModel) {
-        this.userModel = userModel;
+    async checkUserExists(email) {
+        const user = await this.userModel.findOne({ email });
+        return !!user;
     }
-    async resetPassword(email, newPassword) {
-        const hash = await bcrypt.hash(newPassword, 10);
-        const user = await this.userModel.findOneAndUpdate({ email }, { password: hash }, { new: true });
-        return user;
+    async directResetPassword(email, newPassword) {
+        const user = await this.userModel.findOne({ email });
+        if (!user)
+            return null;
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        return true;
+    }
+    async resetPasswordWithToken(email, token, newPassword) {
+        const user = await this.userModel.findOne({ email, resetToken: token });
+        if (!user)
+            return null;
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.resetToken = undefined;
+        await user.save();
+        return true;
+    }
+    constructor(userModel, emailService) {
+        this.userModel = userModel;
+        this.emailService = emailService;
+    }
+    async sendResetLink(email) {
+        const user = await this.userModel.findOne({ email });
+        if (!user)
+            return null;
+        const token = Math.random().toString(36).substr(2);
+        user.resetToken = token;
+        await user.save();
+        const resetLink = `http://localhost:3000/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+        await this.emailService.sendResetLink(email, resetLink);
+        return true;
     }
     async signup(name, email, password) {
         const hash = await bcrypt.hash(password, 10);
@@ -68,6 +97,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        email_service_1.EmailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

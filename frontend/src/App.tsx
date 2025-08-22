@@ -19,6 +19,7 @@ import NotesMenu from './components/NotesMenu';
 
 import ForgotPassword from './components/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
+import ResetPassword from './components/ResetPassword';
 
 function LoginPage({ setUser }: { setUser: (user: { name: string; email: string }) => void }) {
   const navigate = useNavigate();
@@ -55,20 +56,21 @@ function LoginPage({ setUser }: { setUser: (user: { name: string; email: string 
       .catch(() => setLoginError('Network error'));
   };
 
-  const handleForgotPassword = (email: string, password?: string) => {
-    // Prompt for new password
-    const newPassword = window.prompt('Enter your new password:');
-    if (!newPassword) {
-      setForgotMsg('Password reset cancelled.');
-      setTimeout(() => {
-        setForgotMsg('');
-      }, 2000);
-      return;
-    }
+  const validateEmail = async (email: string) => {
+    const res = await fetch('http://localhost:3000/auth/check-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    return data.exists;
+  };
+
+  const handleResetPassword = (email: string, password: string) => {
     fetch('http://localhost:3000/auth/forgot-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: newPassword })
+      body: JSON.stringify({ email, password })
     })
       .then(res => res.json())
       .then(data => {
@@ -76,7 +78,7 @@ function LoginPage({ setUser }: { setUser: (user: { name: string; email: string 
         setTimeout(() => {
           setShowForgot(false);
           setForgotMsg('');
-        }, 2500);
+        }, 3500);
       })
       .catch(() => {
         setForgotMsg('Error resetting password.');
@@ -91,11 +93,12 @@ function LoginPage({ setUser }: { setUser: (user: { name: string; email: string 
           onLogin={handleLogin}
           onCreateAccount={() => navigate('/signup')}
           onForgotPassword={() => setShowForgot(true)}
-          loginError={loginError}
+          loginError={showForgot ? null : loginError}
         />
       ) : (
         <ForgotPassword
-          onSubmit={handleForgotPassword}
+          onValidateEmail={validateEmail}
+          onResetPassword={handleResetPassword}
           onCancel={() => setShowForgot(false)}
         />
       )}
@@ -355,8 +358,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage setUser={setUser} />} />
-        <Route path="/signup" element={<SignupPage />} />
+  <Route path="/" element={<LoginPage setUser={setUser} />} />
+  <Route path="/signup" element={<SignupPage />} />
+  <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/main" element={
           <PrivateRoute user={user}>
             <AppLayout><AppContent /></AppLayout>

@@ -12,6 +12,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("../auth.controller");
 const user_schema_1 = require("./user.schema");
+const email_service_1 = require("./email.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -22,7 +23,7 @@ exports.AuthModule = AuthModule = __decorate([
                 { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
             ]),
         ],
-        providers: [auth_service_1.AuthService],
+        providers: [auth_service_1.AuthService, email_service_1.EmailService],
         controllers: [auth_controller_1.AuthController],
         exports: [auth_service_1.AuthService],
     })

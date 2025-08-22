@@ -16,8 +16,26 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth/auth.service");
 const swagger_1 = require("@nestjs/swagger");
+const swagger_2 = require("@nestjs/swagger");
 const auth_dto_1 = require("./auth/dto/auth.dto");
 let AuthController = class AuthController {
+    async checkUser(body) {
+        if (!body.email) {
+            return { exists: false };
+        }
+        const exists = await this.authService.checkUserExists(body.email);
+        return { exists };
+    }
+    async resetPassword(body) {
+        if (!body.email || !body.token || !body.password) {
+            return { message: 'Missing required fields' };
+        }
+        const result = await this.authService.resetPasswordWithToken(body.email, body.token, body.password);
+        if (!result) {
+            return { message: 'Invalid token or user not found' };
+        }
+        return { message: 'Password reset successful' };
+    }
     constructor(authService) {
         this.authService = authService;
     }
@@ -42,15 +60,48 @@ let AuthController = class AuthController {
         if (!body.email || !body.password) {
             return { message: 'Missing email or new password' };
         }
-        const user = await this.authService.resetPassword(body.email, body.password);
-        if (!user) {
+        const userExists = await this.authService.checkUserExists(body.email);
+        if (!userExists) {
             return { message: 'User not found' };
         }
-        return { message: 'Password updated successfully', user };
+        await this.authService.directResetPassword(body.email, body.password);
+        return { message: 'Password reset successful.' };
     }
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, swagger_2.ApiBody)({
+        schema: {
+            example: {
+                email: 'john@example.com'
+            }
+        }
+    }),
+    (0, common_1.Post)('check-user'),
+    (0, swagger_1.ApiOperation)({ summary: 'Check if user exists by email' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "checkUser", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    (0, swagger_1.ApiOperation)({ summary: 'Reset password using token' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
+__decorate([
+    (0, swagger_2.ApiBody)({
+        schema: {
+            example: {
+                name: 'John Doe',
+                email: 'john@example.com',
+                password: 'yourpassword123'
+            }
+        }
+    }),
     (0, common_1.Post)('signup'),
     (0, swagger_1.ApiOperation)({ summary: 'User signup' }),
     __param(0, (0, common_1.Body)()),
@@ -59,6 +110,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signup", null);
 __decorate([
+    (0, swagger_2.ApiBody)({
+        schema: {
+            example: {
+                email: 'john@example.com',
+                password: 'yourpassword123'
+            }
+        }
+    }),
     (0, common_1.Post)('login'),
     (0, swagger_1.ApiOperation)({ summary: 'User login' }),
     __param(0, (0, common_1.Body)()),
@@ -67,8 +126,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, swagger_2.ApiBody)({
+        schema: {
+            example: {
+                email: 'john@example.com',
+                password: 'newpassword123'
+            }
+        }
+    }),
     (0, common_1.Post)('forgot-password'),
-    (0, swagger_1.ApiOperation)({ summary: 'Forgot password (reset)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Forgot password (direct reset)' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

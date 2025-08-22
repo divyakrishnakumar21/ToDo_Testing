@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EmailService } from './email.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
@@ -6,17 +7,39 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
+  async checkUserExists(email: string) {
+    const user = await this.userModel.findOne({ email });
+    return !!user;
+  }
+  async directResetPassword(email: string, newPassword: string) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) return null;
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    return true;
+  }
+  async resetPasswordWithToken(email: string, token: string, newPassword: string) {
+    const user = await this.userModel.findOne({ email, resetToken: token });
+    if (!user) return null;
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = undefined;
+    await user.save();
+    return true;
+  }
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>
+    @InjectModel(User.name) private userModel: Model<User>,
+    private emailService: EmailService
   ) {}
-  async resetPassword(email: string, newPassword: string) {
-    const hash = await bcrypt.hash(newPassword, 10);
-    const user = await this.userModel.findOneAndUpdate(
-      { email },
-      { password: hash },
-      { new: true }
-    );
-    return user;
+  async sendResetLink(email: string) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) return null;
+    // Generate a simple token (for demo, use a random string)
+    const token = Math.random().toString(36).substr(2);
+    user.resetToken = token;
+    await user.save();
+  const resetLink = `http://localhost:3000/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    await this.emailService.sendResetLink(email, resetLink);
+    return true;
   }
 
   async signup(name: string, email: string, password: string) {

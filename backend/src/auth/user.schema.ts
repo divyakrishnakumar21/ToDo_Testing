@@ -3,6 +3,8 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class User extends Document {
+  @Prop()
+  resetToken?: string;
   @Prop({ required: true })
   name?: string;
 
