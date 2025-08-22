@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - heading "Create Account" [level=2] [ref=e5]
+    - generic [ref=e6]:
+      - textbox "Name" [ref=e7]: Playwright User
+      - textbox "Email" [ref=e8]: playwrightuser@example.com
+      - textbox "Password" [ref=e9]: pwtest123
+      - textbox "Confirm Password" [ref=e10]: pwtest123
+      - button "Sign Up" [active] [ref=e11] [cursor=pointer]
+    - generic [ref=e12]:
+      - generic [ref=e13]: Already have an account?
+      - button "Login" [ref=e14] [cursor=pointer]
+  - generic [ref=e15]:
+    - generic [ref=e16]: World Clocks
+    - generic [ref=e17]:
+      - generic [ref=e18]: 🇮🇳
+      - generic [ref=e19]: Bangalore
+      - generic [ref=e20]: 07:09:20 AM
+    - generic [ref=e21]:
+      - generic [ref=e22]: 🇩🇪
+      - generic [ref=e23]: Berlin
+      - generic [ref=e24]: 03:39:20 AM
+    - generic [ref=e25]:
+      - generic [ref=e26]: 🇺🇸
+      - generic [ref=e27]: Redmond
+      - generic [ref=e28]: 06:39:20 PM
+    - generic [ref=e29]:
+      - generic [ref=e30]: 🇨🇦
+      - generic [ref=e31]: Toronto
+      - generic [ref=e32]: 09:39:20 PM
+  - generic [ref=e33]:
+    - generic [ref=e34]: Berlin Weather
+    - generic [ref=e35]: Berlin Weather
+    - generic [ref=e36]: ☀️
+    - generic [ref=e37]: 13.5°C
+    - generic [ref=e38]: Clear
+    - generic [ref=e39]: "Berlin Time: 03:39:25 AM"
+```

@@ -19,6 +19,13 @@ const swagger_1 = require("@nestjs/swagger");
 const swagger_2 = require("@nestjs/swagger");
 const auth_dto_1 = require("./auth/dto/auth.dto");
 let AuthController = class AuthController {
+    async deleteUser(body) {
+        if (!body.email) {
+            return { message: 'Missing email' };
+        }
+        const deleted = await this.authService.deleteUserByEmail(body.email);
+        return { message: deleted ? 'User deleted' : 'User not found' };
+    }
     async checkUser(body) {
         if (!body.email) {
             return { exists: false };
@@ -43,8 +50,13 @@ let AuthController = class AuthController {
         if (!authDto.email || !authDto.password || !authDto.name) {
             return { message: 'Missing required fields' };
         }
-        const user = await this.authService.signup(authDto.name, authDto.email, authDto.password);
-        return { message: 'Signup successful', user };
+        try {
+            const user = await this.authService.signup(authDto.name, authDto.email, authDto.password);
+            return { message: 'Signup successful', user };
+        }
+        catch (err) {
+            return { message: err.message };
+        }
     }
     async login(authDto) {
         if (!authDto.email || !authDto.password) {
@@ -69,6 +81,21 @@ let AuthController = class AuthController {
     }
 };
 exports.AuthController = AuthController;
+__decorate([
+    (0, common_1.Post)('delete-user'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user by email (for testing only)' }),
+    (0, swagger_2.ApiBody)({
+        schema: {
+            example: {
+                email: 'playwrightuser@example.com'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "deleteUser", null);
 __decorate([
     (0, swagger_2.ApiBody)({
         schema: {

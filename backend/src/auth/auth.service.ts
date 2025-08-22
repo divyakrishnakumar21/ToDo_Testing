@@ -7,6 +7,10 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
+  async deleteUserByEmail(email: string) {
+    const res = await this.userModel.deleteOne({ email });
+    return res.deletedCount > 0;
+  }
   async checkUserExists(email: string) {
     const user = await this.userModel.findOne({ email });
     return !!user;
@@ -43,10 +47,18 @@ export class AuthService {
   }
 
   async signup(name: string, email: string, password: string) {
-    const hash = await bcrypt.hash(password, 10);
-    const user = new this.userModel({ name, email, password: hash });
-    await user.save();
-    return user;
+    try {
+      const hash = await bcrypt.hash(password, 10);
+      const user = new this.userModel({ name, email, password: hash });
+      await user.save();
+      return user;
+    } catch (err: any) {
+      if (err.code === 11000) {
+        // Mongo duplicate key error
+        throw new Error('User with this email already exists');
+      }
+      throw new Error('Database error: ' + err.message);
+    }
   }
 
   async validateUser(email: string, password: string) {

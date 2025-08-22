@@ -20,6 +20,10 @@ const mongoose_2 = require("mongoose");
 const user_schema_1 = require("./user.schema");
 const bcrypt = require("bcryptjs");
 let AuthService = class AuthService {
+    async deleteUserByEmail(email) {
+        const res = await this.userModel.deleteOne({ email });
+        return res.deletedCount > 0;
+    }
     async checkUserExists(email) {
         const user = await this.userModel.findOne({ email });
         return !!user;
@@ -57,10 +61,18 @@ let AuthService = class AuthService {
         return true;
     }
     async signup(name, email, password) {
-        const hash = await bcrypt.hash(password, 10);
-        const user = new this.userModel({ name, email, password: hash });
-        await user.save();
-        return user;
+        try {
+            const hash = await bcrypt.hash(password, 10);
+            const user = new this.userModel({ name, email, password: hash });
+            await user.save();
+            return user;
+        }
+        catch (err) {
+            if (err.code === 11000) {
+                throw new Error('User with this email already exists');
+            }
+            throw new Error('Database error: ' + err.message);
+        }
     }
     async validateUser(email, password) {
         const user = await this.userModel.findOne({ email });

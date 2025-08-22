@@ -8,6 +8,22 @@ import { AuthDto } from './auth/dto/auth.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
+  @Post('delete-user')
+  @ApiOperation({ summary: 'Delete user by email (for testing only)' })
+  @ApiBody({
+    schema: {
+      example: {
+        email: 'playwrightuser@example.com'
+      }
+    }
+  })
+  async deleteUser(@Body() body: { email: string }) {
+    if (!body.email) {
+      return { message: 'Missing email' };
+    }
+    const deleted = await this.authService.deleteUserByEmail(body.email);
+    return { message: deleted ? 'User deleted' : 'User not found' };
+  }
   @ApiBody({
   schema: {
     example: {
@@ -53,8 +69,12 @@ export class AuthController {
     if (!authDto.email || !authDto.password || !authDto.name) {
       return { message: 'Missing required fields' };
     }
-    const user = await this.authService.signup(authDto.name, authDto.email, authDto.password);
-    return { message: 'Signup successful', user };
+    try {
+      const user = await this.authService.signup(authDto.name, authDto.email, authDto.password);
+      return { message: 'Signup successful', user };
+    } catch (err: any) {
+      return { message: err.message };
+    }
   }
 
   @ApiBody({

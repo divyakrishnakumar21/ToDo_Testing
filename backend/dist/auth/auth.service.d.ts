@@ -4,6 +4,7 @@ import { User } from './user.schema';
 export declare class AuthService {
     private userModel;
     private emailService;
+    deleteUserByEmail(email: string): Promise<boolean>;
     checkUserExists(email: string): Promise<boolean>;
     directResetPassword(email: string, newPassword: string): Promise<true | null>;
     resetPasswordWithToken(email: string, token: string, newPassword: string): Promise<true | null>;

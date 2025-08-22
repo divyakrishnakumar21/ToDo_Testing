@@ -2,6 +2,11 @@ import { AuthService } from './auth/auth.service';
 import { AuthDto } from './auth/dto/auth.dto';
 export declare class AuthController {
     private readonly authService;
+    deleteUser(body: {
+        email: string;
+    }): Promise<{
+        message: string;
+    }>;
     checkUser(body: {
         email: string;
     }): Promise<{
@@ -17,14 +22,14 @@ export declare class AuthController {
     constructor(authService: AuthService);
     signup(authDto: AuthDto): Promise<{
         message: string;
-        user?: undefined;
-    } | {
-        message: string;
         user: import("mongoose").Document<unknown, {}, import("./auth/user.schema").User, {}, {}> & import("./auth/user.schema").User & Required<{
             _id: unknown;
         }> & {
             __v: number;
         };
+    } | {
+        message: any;
+        user?: undefined;
     }>;
     login(authDto: AuthDto): Promise<{
         message: string;
